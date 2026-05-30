@@ -47,7 +47,16 @@ export function ResumeUpload() {
       })
       setResult(data)
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Analysis failed'
+      // Extract the real error detail from the server response
+      let msg = 'Analysis failed. Please try again.'
+      if (e && typeof e === 'object') {
+        const axiosErr = e as { response?: { data?: { detail?: string }; status?: number }; message?: string }
+        if (axiosErr.response?.data?.detail) {
+          msg = axiosErr.response.data.detail
+        } else if (axiosErr.message) {
+          msg = axiosErr.message
+        }
+      }
       setResult({ ats_score: 0, grade: 'F', summary: msg, strengths: [], improvements: [], missing_keywords: [], recommended_keywords: [], format_issues: [], quick_wins: [], error: msg })
     } finally {
       setLoading(false)
