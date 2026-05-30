@@ -2,7 +2,48 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Briefcase, Search, Bookmark } from 'lucide-react'
+import { Briefcase, Search, Bookmark, Sparkles, Crown } from 'lucide-react'
+import { useSubscription } from '@/hooks/useSubscription'
+
+function PlanBadge() {
+  const { data: sub } = useSubscription()
+  const plan = sub?.plan_code ?? 'free'
+
+  if (plan === 'free') {
+    return (
+      <Link
+        href="/pricing"
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '6px 14px', borderRadius: 999, textDecoration: 'none',
+          background: 'rgba(0,201,177,0.1)', border: '1px solid rgba(0,201,177,0.3)',
+          color: '#00C9B1', fontSize: 13, fontWeight: 700,
+        }}
+      >
+        <Sparkles size={13} />
+        Upgrade
+      </Link>
+    )
+  }
+
+  const isEnterprise = plan === 'enterprise'
+  return (
+    <Link
+      href="/pricing"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '6px 14px', borderRadius: 999, textDecoration: 'none',
+        background: isEnterprise ? 'rgba(192,132,252,0.12)' : 'rgba(56,189,248,0.12)',
+        border: `1px solid ${isEnterprise ? 'rgba(192,132,252,0.4)' : 'rgba(56,189,248,0.4)'}`,
+        color: isEnterprise ? '#C084FC' : '#38BDF8', fontSize: 13, fontWeight: 700,
+        textTransform: 'capitalize',
+      }}
+    >
+      <Crown size={13} />
+      {plan}
+    </Link>
+  )
+}
 
 const S = {
   nav: {
@@ -93,6 +134,7 @@ export function Navbar() {
         <div style={S.links}>
           <NavLink href="/search" icon={Search} label="Search Jobs" active={path === '/search'} />
           <NavLink href="/saved" icon={Bookmark} label="Saved" active={path === '/saved'} />
+          <PlanBadge />
         </div>
       </div>
     </nav>

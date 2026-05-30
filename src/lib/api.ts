@@ -47,3 +47,15 @@ export const savedApi = {
   save: (job: object) => api.post('/saved', job),
   remove: (jobId: string) => api.delete(`/saved/${jobId}`),
 }
+
+export const paymentApi = {
+  plans: () => api.get('/payments/plans'),
+  subscription: () => api.get('/payments/subscription'),
+  createOrder: (product_key: string, idempotency_key: string) =>
+    api.post('/payments/create-order', { product_key, idempotency_key }),
+  verify: (data: {
+    razorpay_order_id: string
+    razorpay_payment_id: string
+    razorpay_signature: string
+  }) => api.post('/payments/verify', data),
+}
