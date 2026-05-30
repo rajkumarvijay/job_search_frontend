@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, MapPin, Zap } from 'lucide-react'
 import { POPULAR_KEYWORDS, INDIA_CITIES } from '@/lib/constants'
+import { ResumeUpload } from '@/components/search/ResumeUpload'
 
 export function HeroSection() {
   const router = useRouter()
@@ -154,21 +155,18 @@ export function HeroSection() {
               ))}
             </select>
           </div>
-          {/* Button */}
-          <button
-            onClick={handleSearch}
-            className="jq-btn"
-            style={{
-              margin: 8,
-              borderRadius: 12,
-              fontSize: 15,
-              padding: '0 28px',
-              minHeight: 48,
-            }}
-          >
-            <Search size={16} />
-            Search Jobs
-          </button>
+          {/* Resume upload + Search button row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: 8, flexShrink: 0 }}>
+            <ResumeUpload />
+            <button
+              onClick={handleSearch}
+              className="jq-btn"
+              style={{ borderRadius: 12, fontSize: 15, padding: '0 22px', minHeight: 48 }}
+            >
+              <Search size={16} />
+              Search Jobs
+            </button>
+          </div>
         </div>
 
         {/* Quick keywords */}
