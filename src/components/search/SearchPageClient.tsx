@@ -8,6 +8,7 @@ import { FilterSidebar } from './FilterSidebar'
 import { SourceBadge } from './SourceBadge'
 import { useJobSearch } from '@/hooks/useJobSearch'
 import { useSearchHistory } from '@/hooks/useSearchHistory'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Search } from 'lucide-react'
 
 function FilterLoading() {
@@ -118,29 +119,29 @@ function SearchContent() {
   )
 }
 
-// Exported component — wraps SearchContent in its own Suspense
-// so useSearchParams() is always inside a boundary
+// Exported component — wraps everything in ErrorBoundary + Suspense
 export function SearchPageClient() {
   return (
-    <Suspense fallback={
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{
-          height: 56, borderRadius: 16, background: '#0F2044',
-          border: '1px solid #1E3A5F', marginBottom: 32,
-          animation: 'pulse 2s ease-in-out infinite',
-        }} />
-        <div style={{ display: 'flex', gap: 24 }}>
-          <div style={{ width: 240, height: 400, borderRadius: 16, background: '#0F2044', border: '1px solid #1E3A5F', animation: 'pulse 2s ease-in-out infinite' }} />
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} style={{ height: 180, borderRadius: 16, background: '#0F2044', border: '1px solid #1E3A5F', animation: 'pulse 2s ease-in-out infinite', animationDelay: `${i * 100}ms` }} />
-            ))}
-          </div>
+    <ErrorBoundary>
+      <Suspense fallback={<SearchSkeleton />}>
+        <SearchContent />
+      </Suspense>
+    </ErrorBoundary>
+  )
+}
+
+function SearchSkeleton() {
+  return (
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ height: 56, borderRadius: 16, background: '#0F2044', border: '1px solid #1E3A5F', marginBottom: 32 }} />
+      <div style={{ display: 'flex', gap: 24 }}>
+        <div style={{ width: 240, height: 400, borderRadius: 16, background: '#0F2044', border: '1px solid #1E3A5F', flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: 16 }}>
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} style={{ height: 180, borderRadius: 16, background: '#0F2044', border: '1px solid #1E3A5F' }} />
+          ))}
         </div>
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }`}</style>
       </div>
-    }>
-      <SearchContent />
-    </Suspense>
+    </div>
   )
 }
