@@ -85,3 +85,55 @@ export interface SavedJob {
 }
 
 export type Platform = 'linkedin' | 'indeed' | 'glassdoor' | 'naukri' | 'ziprecruiter' | 'google'
+
+export interface SectionScores {
+  contact_info: number
+  professional_summary: number
+  work_experience: number
+  skills: number
+  education: number
+  keywords_and_ats: number
+}
+
+export interface Improvement {
+  category: string
+  issue: string
+  fix: string
+  impact: 'High' | 'Medium' | 'Low'
+}
+
+export interface RecommendedJob {
+  job_id: string
+  title: string
+  company: string
+  location: string
+  job_url?: string
+  description?: string
+  min_salary?: number
+  max_salary?: number
+  salary_currency?: string
+  job_type?: string
+  is_remote?: boolean
+  platform: string
+  match_score: number
+  match_reason: string
+}
+
+export interface ResumeResult {
+  ats_score: number
+  grade: string
+  experience_level: string
+  years_experience: number | null
+  summary: string
+  section_scores: SectionScores
+  top_skills: string[]
+  recommended_roles: string[]
+  strengths: string[]
+  improvements: Improvement[]
+  missing_keywords: string[]
+  recommended_keywords: string[]
+  format_issues: string[]
+  quick_wins: string[]
+  recommended_jobs?: RecommendedJob[]
+  error?: string
+}

@@ -48,6 +48,30 @@ export const savedApi = {
   remove: (jobId: string) => api.delete(`/saved/${jobId}`),
 }
 
+export const resumeApi = {
+  /** Fast ATS score — used by the search-bar button */
+  analyse: (file: File, targetRole = '') => {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('target_role', targetRole)
+    return api.post('/ai/resume', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 90_000,
+    })
+  },
+  /** Full analysis + job recommendations — used by /resume page */
+  full: (file: File, targetRole = '', jobCount = 6) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('target_role', targetRole)
+    fd.append('job_count', String(jobCount))
+    return api.post('/ai/resume/full', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120_000,
+    })
+  },
+}
+
 export const paymentApi = {
   plans: () => api.get('/payments/plans'),
   subscription: () => api.get('/payments/subscription'),

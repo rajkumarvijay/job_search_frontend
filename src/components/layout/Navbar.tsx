@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Briefcase, Search, Bookmark, Sparkles, Crown } from 'lucide-react'
+import { Briefcase, Search, Bookmark, Sparkles, Crown, FileText } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 
 function PlanBadge() {
@@ -133,6 +133,7 @@ export function Navbar() {
         </Link>
         <div style={S.links}>
           <NavLink href="/search" icon={Search} label="Search Jobs" active={path === '/search'} />
+          <NavLink href="/resume" icon={FileText} label="Resume Score" active={path === '/resume'} />
           <NavLink href="/saved" icon={Bookmark} label="Saved" active={path === '/saved'} />
           <PlanBadge />
         </div>
