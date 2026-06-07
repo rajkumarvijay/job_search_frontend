@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Briefcase, Search, Bookmark, Sparkles, Crown, FileText } from 'lucide-react'
+import { Briefcase, Search, Bookmark, Sparkles, Crown, FileText, Home, PlusCircle } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 
 function PlanBadge() {
@@ -132,9 +132,29 @@ export function Navbar() {
           </span>
         </Link>
         <div style={S.links}>
-          <NavLink href="/search" icon={Search} label="Search Jobs" active={path === '/search'} />
-          <NavLink href="/resume" icon={FileText} label="Resume Score" active={path === '/resume'} />
-          <NavLink href="/saved" icon={Bookmark} label="Saved" active={path === '/saved'} />
+          <NavLink href="/"          icon={Home}       label="Home"        active={path === '/'} />
+          <NavLink href="/search"    icon={Search}     label="Search Jobs" active={path === '/search'} />
+          <NavLink href="/resume"    icon={FileText}   label="Resume Score" active={path === '/resume'} />
+          <NavLink href="/saved"     icon={Bookmark}   label="Saved"       active={path === '/saved'} />
+          {/* Post a Job — highlighted CTA */}
+          <Link
+            href="/post-job"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '8px 16px', borderRadius: 10,
+              fontSize: 14, fontWeight: 700, textDecoration: 'none',
+              background: path === '/post-job'
+                ? '#00C9B1'
+                : 'linear-gradient(135deg, #00C9B1 0%, #0EA5E9 100%)',
+              color: '#0A1628',
+              boxShadow: '0 0 14px rgba(0,201,177,0.35)',
+              transition: 'all 0.18s',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <PlusCircle size={15} />
+            Post a Job
+          </Link>
           <PlanBadge />
         </div>
       </div>

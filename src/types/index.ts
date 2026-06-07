@@ -84,7 +84,30 @@ export interface SavedJob {
   saved_at: string
 }
 
-export type Platform = 'linkedin' | 'indeed' | 'glassdoor' | 'naukri' | 'ziprecruiter' | 'google'
+export type Platform = 'linkedin' | 'indeed' | 'glassdoor' | 'naukri' | 'ziprecruiter' | 'google' | 'portal'
+
+export interface PostJobPayload {
+  title: string
+  company: string
+  location: string
+  job_type?: string
+  work_mode?: string
+  experience?: string
+  min_salary?: number
+  max_salary?: number
+  salary_currency?: string
+  description: string
+  skills?: string
+  contact_email: string
+  apply_url?: string
+  company_url?: string
+}
+
+export interface PostedJobOut extends PostJobPayload {
+  job_id: string
+  is_active: boolean
+  posted_at: string
+}
 
 export interface SectionScores {
   contact_info: number

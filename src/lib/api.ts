@@ -72,6 +72,12 @@ export const resumeApi = {
   },
 }
 
+export const postJobApi = {
+  submit: (data: object) => api.post('/post-jobs/', data),
+  list:   (q = '')       => api.get('/post-jobs/', { params: { q } }),
+  get:    (jobId: string)=> api.get(`/post-jobs/${jobId}`),
+}
+
 export const paymentApi = {
   plans: () => api.get('/payments/plans'),
   subscription: () => api.get('/payments/subscription'),
