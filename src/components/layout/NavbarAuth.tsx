@@ -1,11 +1,13 @@
 'use client'
 
 /**
- * NavbarAuth — auth section of the navbar (client-only).
+ * NavbarAuth — auth section of the navbar (loaded client-side only via
+ * next/dynamic({ ssr: false }) in Navbar.tsx).
  *
- * Imported via next/dynamic({ ssr: false }) in Navbar.tsx so that
- * @react-oauth/google (which accesses window/document at module load)
- * never runs during Next.js server-side rendering.
+ * GoogleOAuthProvider is always present in the tree (see Providers.tsx) so
+ * useGoogleLogin never throws a missing-context error.
+ * When NEXT_PUBLIC_GOOGLE_CLIENT_ID is not configured we simply hide the
+ * Google button — the rest of the auth UI (email sign-in / sign-up) still works.
  */
 
 import { useState, useRef, useEffect } from 'react'
@@ -18,7 +20,12 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { authApi } from '@/lib/api'
 import type { TokenResponse } from '@/types'
 
-/* ── shared panel style (duplicated from Navbar so this file is standalone) ── */
+/** True only when the Google client ID is baked into the bundle at build time */
+const GOOGLE_ENABLED =
+  !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID !== '__missing__'
+
+/* ── shared panel style ──────────────────────────────────────────────────── */
 function panelStyle(minW: number): React.CSSProperties {
   return {
     position: 'absolute', top: 'calc(100% + 10px)', right: 0,
@@ -31,13 +38,65 @@ function panelStyle(minW: number): React.CSSProperties {
 }
 
 /* ══════════════════════════════════════════════════════
+   GOOGLE LOGIN BUTTON
+   Isolated so useGoogleLogin is only called when this
+   component is actually rendered (Google is configured).
+══════════════════════════════════════════════════════ */
+function GoogleLoginButton({
+  onSuccess,
+  onError,
+  loading,
+}: {
+  onSuccess: (t: { access_token: string }) => void
+  onError:   () => void
+  loading:   boolean
+}) {
+  const googleLogin = useGoogleLogin({ onSuccess, onError })
+
+  return (
+    <button
+      onClick={() => googleLogin()}
+      disabled={loading}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+        padding: '11px 16px', borderRadius: 10, cursor: loading ? 'wait' : 'pointer',
+        background: '#fff', border: '1.5px solid #e0e0e0',
+        fontSize: 14, fontWeight: 600, color: '#1a1a1a',
+        transition: 'all 0.18s', marginBottom: 4,
+        boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+        opacity: loading ? 0.7 : 1,
+      }}
+      onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)')}
+      onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.15)')}
+    >
+      {loading ? (
+        <span style={{
+          width: 16, height: 16, borderRadius: '50%',
+          border: '2px solid #ccc', borderTopColor: '#1a1a1a',
+          animation: 'spin 0.7s linear infinite', display: 'inline-block',
+        }} />
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          <path fill="none" d="M0 0h48v48H0z"/>
+        </svg>
+      )}
+      {loading ? 'Signing in…' : 'Continue with Google'}
+    </button>
+  )
+}
+
+/* ══════════════════════════════════════════════════════
    AUTH DROPDOWN  (combined Sign In / Sign Up / Google)
 ══════════════════════════════════════════════════════ */
 function AuthDropdown() {
   const setAuth = useAuthStore(s => s.setAuth)
-  const [open, setOpen]         = useState(false)
+  const [open, setOpen]           = useState(false)
   const [googleErr, setGoogleErr] = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading]     = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -63,11 +122,6 @@ function AuthDropdown() {
       setLoading(false)
     }
   }
-
-  const googleLogin = useGoogleLogin({
-    onSuccess: handleGoogleSuccess,
-    onError: () => setGoogleErr('Google sign-in was cancelled or failed.'),
-  })
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -102,58 +156,33 @@ function AuthDropdown() {
             </div>
           </div>
 
-          {/* Google button */}
-          <button
-            onClick={() => { setGoogleErr(''); googleLogin() }}
-            disabled={loading}
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              padding: '11px 16px', borderRadius: 10, cursor: loading ? 'wait' : 'pointer',
-              background: '#fff', border: '1.5px solid #e0e0e0',
-              fontSize: 14, fontWeight: 600, color: '#1a1a1a',
-              transition: 'all 0.18s', marginBottom: 4,
-              boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-              opacity: loading ? 0.7 : 1,
-            }}
-            onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)')}
-            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.15)')}
-          >
-            {loading ? (
-              <span style={{
-                width: 16, height: 16, borderRadius: '50%',
-                border: '2px solid #ccc', borderTopColor: '#1a1a1a',
-                animation: 'spin 0.7s linear infinite', display: 'inline-block',
-              }} />
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                <path fill="none" d="M0 0h48v48H0z"/>
-              </svg>
-            )}
-            {loading ? 'Signing in…' : 'Continue with Google'}
-          </button>
+          {/* Google button — only rendered when client ID is configured */}
+          {GOOGLE_ENABLED && (
+            <>
+              <GoogleLoginButton
+                onSuccess={handleGoogleSuccess}
+                onError={() => setGoogleErr('Google sign-in was cancelled or failed.')}
+                loading={loading}
+              />
+              {googleErr && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 12px', borderRadius: 8, marginBottom: 4,
+                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
+                  color: '#FCA5A5', fontSize: 12,
+                }}>
+                  <AlertCircle size={12} />{googleErr}
+                </div>
+              )}
 
-          {/* Google error */}
-          {googleErr && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '8px 12px', borderRadius: 8, marginBottom: 4,
-              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
-              color: '#FCA5A5', fontSize: 12,
-            }}>
-              <AlertCircle size={12} />{googleErr}
-            </div>
+              {/* Divider */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '14px 0' }}>
+                <div style={{ flex: 1, height: 1, background: '#1E3A5F' }} />
+                <span style={{ fontSize: 11, color: '#4A6FA5', fontWeight: 600, letterSpacing: '0.08em' }}>OR</span>
+                <div style={{ flex: 1, height: 1, background: '#1E3A5F' }} />
+              </div>
+            </>
           )}
-
-          {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '14px 0' }}>
-            <div style={{ flex: 1, height: 1, background: '#1E3A5F' }} />
-            <span style={{ fontSize: 11, color: '#4A6FA5', fontWeight: 600, letterSpacing: '0.08em' }}>OR</span>
-            <div style={{ flex: 1, height: 1, background: '#1E3A5F' }} />
-          </div>
 
           {/* Email sign-in */}
           <Link
@@ -316,7 +345,6 @@ export default function NavbarAuth() {
   const { user, isLoading } = useAuthStore()
 
   if (isLoading) {
-    // Thin placeholder so layout doesn't jump
     return <div style={{ width: 88, height: 36 }} />
   }
 
