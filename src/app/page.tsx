@@ -1,6 +1,5 @@
 import { HeroSection } from '@/components/home/HeroSection'
 import { LiveStats } from '@/components/home/LiveStats'
-import { SectionDivider } from '@/components/home/SectionDivider'
 import { TrendingRoles } from '@/components/home/TrendingRoles'
 import { PopularKeywords } from '@/components/home/PopularKeywords'
 import { SkillRoadmap } from '@/components/home/SkillRoadmap'
@@ -12,7 +11,6 @@ export default function HomePage() {
     <>
       <HeroSection />
       <LiveStats />
-      <SectionDivider />
       <TrendingRoles />
       <PopularKeywords />
       <SkillRoadmap />
