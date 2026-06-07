@@ -1,9 +1,12 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import { useEffect, useRef } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { useAuthStore } from '@/store/useAuthStore'
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ''
 
 function SessionInit() {
   const initSession = useAppStore((s) => s.initSession)
@@ -30,9 +33,11 @@ const queryClient = new QueryClient({
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionInit />
-      {children}
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <QueryClientProvider client={queryClient}>
+        <SessionInit />
+        {children}
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   )
 }

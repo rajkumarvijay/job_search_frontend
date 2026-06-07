@@ -90,6 +90,8 @@ export interface AuthUser {
   id: number
   name: string
   email: string
+  auth_provider: string
+  avatar_url?: string | null
   created_at: string
 }
 
