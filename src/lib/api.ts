@@ -73,9 +73,12 @@ export const resumeApi = {
 }
 
 export const postJobApi = {
-  submit: (data: object) => api.post('/post-jobs/', data),
-  list:   (q = '')       => api.get('/post-jobs/', { params: { q } }),
-  get:    (jobId: string)=> api.get(`/post-jobs/${jobId}`),
+  submit:   (data: object)                          => api.post('/post-jobs/', data),
+  list:     (q = '', email = '')                    => api.get('/post-jobs/', { params: { q, email } }),
+  get:      (jobId: string)                         => api.get(`/post-jobs/${jobId}`),
+  update:   (jobId: string, data: object)           => api.put(`/post-jobs/${jobId}`, data),
+  remove:   (jobId: string, contact_email: string)  => api.delete(`/post-jobs/${jobId}`, { data: { contact_email } }),
+  byEmail:  (email: string)                         => api.get('/post-jobs/', { params: { email } }),
 }
 
 export const paymentApi = {
