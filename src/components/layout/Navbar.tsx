@@ -121,7 +121,7 @@ function ResumeDropdown({ path }: { path: string }) {
         }}
       >
         <FileText size={15} />
-        <span>Resume Score</span>
+        <span>Explore</span>
         <ChevronDown
           size={13}
           style={{
