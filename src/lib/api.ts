@@ -10,9 +10,10 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const sessionId = localStorage.getItem('job_portal_session_id')
-    if (sessionId) {
-      config.headers['X-Session-ID'] = sessionId
-    }
+    if (sessionId) config.headers['X-Session-ID'] = sessionId
+
+    const token = localStorage.getItem('jq_auth_token')
+    if (token) config.headers['Authorization'] = `Bearer ${token}`
   }
   return config
 })
@@ -70,6 +71,14 @@ export const resumeApi = {
       timeout: 120_000,
     })
   },
+}
+
+export const authApi = {
+  signup: (data: { name: string; email: string; password: string }) =>
+    api.post('/auth/signup', data),
+  login: (data: { email: string; password: string }) =>
+    api.post('/auth/login', data),
+  me: () => api.get('/auth/me'),
 }
 
 export const postJobApi = {
