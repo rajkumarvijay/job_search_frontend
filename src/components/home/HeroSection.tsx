@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, MapPin, Zap } from 'lucide-react'
 import { POPULAR_KEYWORDS, INDIA_CITIES } from '@/lib/constants'
-import { ResumeUpload } from '@/components/search/ResumeUpload'
 
 export function HeroSection() {
   const router = useRouter()
@@ -155,9 +154,8 @@ export function HeroSection() {
               ))}
             </select>
           </div>
-          {/* Resume upload + Search button row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: 8, flexShrink: 0 }}>
-            <ResumeUpload />
+          {/* Search button */}
+          <div style={{ display: 'flex', alignItems: 'center', margin: 8, flexShrink: 0 }}>
             <button
               onClick={handleSearch}
               className="jq-btn"
@@ -208,22 +206,6 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll hint */}
-      <div style={{
-        position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-        color: '#8B9DC3', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase',
-        animation: 'float 2.5s ease-in-out infinite',
-      }}>
-        <div style={{
-          width: 20, height: 32, borderRadius: 10,
-          border: '1.5px solid #1E3A5F',
-          display: 'flex', justifyContent: 'center', paddingTop: 5,
-        }}>
-          <div style={{ width: 4, height: 8, borderRadius: 2, background: '#00C9B1', opacity: 0.8 }} />
-        </div>
-        Scroll
-      </div>
     </section>
   )
 }
