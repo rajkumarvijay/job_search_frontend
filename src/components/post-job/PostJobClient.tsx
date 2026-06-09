@@ -7,7 +7,7 @@ import {
   CheckCircle2, AlertCircle, ChevronRight, Sparkles,
   Users, Globe, PlusCircle, ListChecks,
   Pencil, Trash2, X, Search, Calendar, Building2,
-  UserCheck, ArrowLeft, Send,
+  UserCheck, ArrowLeft,
 } from 'lucide-react'
 import { postJobApi } from '@/lib/api'
 import { INDIA_CITIES } from '@/lib/constants'
@@ -28,22 +28,12 @@ interface FormData {
   apply_url: string; company_url: string
 }
 
-interface SeekerData {
-  name: string; email: string; current_role: string; experience: string
-  location: string; skills: string; open_to: string[]; portfolio_url: string; bio: string
-}
-
 const EMPTY: FormData = {
   title: '', company: '', location: 'India', customLocation: '',
   job_type: 'Full-time', work_mode: 'On-site', experience: 'Any',
   min_salary: '', max_salary: '', salary_currency: 'INR',
   description: '', skills: '', contact_email: '',
   apply_url: '', company_url: '',
-}
-
-const EMPTY_SEEKER: SeekerData = {
-  name: '', email: '', current_role: '', experience: 'Any',
-  location: 'India', skills: '', open_to: ['Full-time'], portfolio_url: '', bio: '',
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -101,33 +91,6 @@ function PillGroup({
   )
 }
 
-function MultiPillGroup({
-  options, values, onChange, colorMap,
-}: {
-  options: string[]; values: string[]; onChange: (v: string[]) => void; colorMap?: Record<string, string>
-}) {
-  function toggle(opt: string) {
-    onChange(values.includes(opt) ? values.filter(v => v !== opt) : [...values, opt])
-  }
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-      {options.map(opt => {
-        const active = values.includes(opt)
-        const color = colorMap?.[opt] ?? '#00C9B1'
-        return (
-          <button key={opt} type="button" onClick={() => toggle(opt)} style={{
-            padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', transition: 'all 0.18s',
-            border: `1.5px solid ${active ? color : '#1E3A5F'}`,
-            background: active ? `${color}18` : 'transparent',
-            color: active ? color : '#8B9DC3',
-          }}>{opt}</button>
-        )
-      })}
-    </div>
-  )
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    ROLE SELECTOR  (landing screen)
 ═══════════════════════════════════════════════════════════════════════════ */
@@ -173,10 +136,10 @@ function RoleSelector({ onSelect }: { onSelect: (r: 'seeker' | 'employer') => vo
             I&apos;m a Job Seeker
           </div>
           <div style={{ fontSize: 14, color: '#8B9DC3', lineHeight: 1.65, marginBottom: 20 }}>
-            Post your profile and availability. Let employers discover you — share your skills, experience, and what you&apos;re looking for.
+            Looking for a role or hiring part-time? Post a job listing for free — whether you&apos;re a freelancer, consultant, or individual with an opportunity to share.
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {['Share your skills & experience', 'Get discovered by top employers', 'Set your preferred work mode & location'].map(pt => (
+            {['Post any job listing for free', 'Reach thousands of active candidates', 'Edit or remove your post anytime'].map(pt => (
               <div key={pt} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64A8D4' }}>
                 <CheckCircle2 size={13} color="#38BDF8" /> {pt}
               </div>
@@ -188,7 +151,7 @@ function RoleSelector({ onSelect }: { onSelect: (r: 'seeker' | 'employer') => vo
             background: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.3)',
             color: '#38BDF8', fontSize: 13, fontWeight: 700,
           }}>
-            Post My Profile <ChevronRight size={14} />
+            Post a Job <ChevronRight size={14} />
           </div>
         </button>
 
@@ -246,183 +209,6 @@ function RoleSelector({ onSelect }: { onSelect: (r: 'seeker' | 'employer') => vo
 
       </div>
     </div>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   JOB SEEKER FORM
-═══════════════════════════════════════════════════════════════════════════ */
-function SeekerForm() {
-  const [form, setForm] = useState<SeekerData>(EMPTY_SEEKER)
-  const [stage, setStage] = useState<Stage>('idle')
-  const [error, setError] = useState('')
-  const [focused, setFocused] = useState('')
-
-  const set = (key: keyof SeekerData) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm(p => ({ ...p, [key]: e.target.value }))
-  const setVal = (key: keyof SeekerData) => (v: string) => setForm(p => ({ ...p, [key]: v }))
-
-  const inp = (field: string): React.CSSProperties => ({
-    ...baseInput, borderColor: focused === field ? '#38BDF8' : '#1E3A5F',
-  })
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError('')
-    if (!form.name.trim())   return setError('Your name is required.')
-    if (!form.email.trim())  return setError('Email address is required.')
-    if (!form.skills.trim()) return setError('Please list at least one skill.')
-    if (form.open_to.length === 0) return setError('Select at least one job type you are open to.')
-    // Simulate success (profile storage would be wired to backend separately)
-    setStage('success')
-  }
-
-  if (stage === 'success') {
-    return (
-      <div style={{
-        minHeight: '50vh', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', padding: '40px 24px',
-      }}>
-        <div style={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
-          <div style={{
-            width: 80, height: 80, borderRadius: '50%',
-            background: 'rgba(56,189,248,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 28px',
-            boxShadow: '0 0 32px rgba(56,189,248,0.2)',
-          }}>
-            <CheckCircle2 size={40} color="#38BDF8" />
-          </div>
-          <h2 style={{ fontSize: 28, fontWeight: 900, color: '#F0F4FF', marginBottom: 12 }}>
-            Profile Submitted!
-          </h2>
-          <p style={{ color: '#8B9DC3', fontSize: 15, lineHeight: 1.7, marginBottom: 28 }}>
-            Thanks, <strong style={{ color: '#38BDF8' }}>{form.name}</strong>! Your profile has been received. Employers matching your skills and preferences will be able to reach you at <strong style={{ color: '#F0F4FF' }}>{form.email}</strong>.
-          </p>
-          <button
-            onClick={() => { setForm(EMPTY_SEEKER); setStage('idle') }}
-            style={{
-              padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 700,
-              background: 'rgba(56,189,248,0.1)', border: '1.5px solid rgba(56,189,248,0.3)',
-              color: '#38BDF8', cursor: 'pointer',
-            }}
-          >
-            Submit Another Profile
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <form onSubmit={handleSubmit} noValidate>
-
-      {/* Personal Info */}
-      <div style={card}>
-        <SectionHeader icon={<UserCheck size={18} color="#38BDF8" />} text="Personal Information" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-          <div>
-            <label style={labelStyle}>Full Name *</label>
-            <input value={form.name} onChange={set('name')} required
-              placeholder="e.g. Priya Sharma" style={inp('name')}
-              onFocus={() => setFocused('name')} onBlur={() => setFocused('')} />
-          </div>
-          <div>
-            <label style={labelStyle}>Email Address *</label>
-            <input type="email" value={form.email} onChange={set('email')} required
-              placeholder="priya@example.com" style={inp('email')}
-              onFocus={() => setFocused('email')} onBlur={() => setFocused('')} />
-          </div>
-          <div>
-            <label style={labelStyle}>Current / Recent Role</label>
-            <input value={form.current_role} onChange={set('current_role')}
-              placeholder="e.g. Frontend Developer" style={inp('current_role')}
-              onFocus={() => setFocused('current_role')} onBlur={() => setFocused('')} />
-          </div>
-          <div>
-            <label style={labelStyle}>Portfolio / LinkedIn URL</label>
-            <input type="url" value={form.portfolio_url} onChange={set('portfolio_url')}
-              placeholder="https://linkedin.com/in/yourname" style={inp('portfolio_url')}
-              onFocus={() => setFocused('portfolio_url')} onBlur={() => setFocused('')} />
-          </div>
-        </div>
-      </div>
-
-      {/* Experience & Location */}
-      <div style={card}>
-        <SectionHeader icon={<MapPin size={18} color="#38BDF8" />} text="Experience & Location" />
-        <div style={{ marginBottom: 24 }}>
-          <label style={labelStyle}>Years of Experience</label>
-          <PillGroup
-            options={['Fresher', '1-3 years', '3-5 years', '5-8 years', '8+ years']}
-            value={form.experience} onChange={setVal('experience')}
-            colorMap={{ 'Fresher': '#38BDF8', '1-3 years': '#00C9B1', '3-5 years': '#A78BFA', '5-8 years': '#FBBF24', '8+ years': '#FB923C' }}
-          />
-        </div>
-        <div>
-          <label style={labelStyle}>Preferred Location</label>
-          <select value={form.location} onChange={set('location')}
-            style={{ ...inp('location'), cursor: 'pointer' }}
-            onFocus={() => setFocused('location')} onBlur={() => setFocused('')}>
-            {INDIA_CITIES.map(c => <option key={c} value={c} style={{ background: '#0A1628' }}>{c}</option>)}
-          </select>
-        </div>
-      </div>
-
-      {/* Skills & Availability */}
-      <div style={card}>
-        <SectionHeader icon={<Sparkles size={18} color="#A78BFA" />} text="Skills & Availability" />
-        <div style={{ marginBottom: 24 }}>
-          <label style={labelStyle}>Key Skills * (comma-separated)</label>
-          <input value={form.skills} onChange={set('skills')} required
-            placeholder="e.g. React, Python, AWS, Product Management"
-            style={inp('skills')}
-            onFocus={() => setFocused('skills')} onBlur={() => setFocused('')} />
-        </div>
-        <div>
-          <label style={labelStyle}>Open To (select all that apply) *</label>
-          <MultiPillGroup
-            options={['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance', 'Remote']}
-            values={form.open_to}
-            onChange={v => setForm(p => ({ ...p, open_to: v }))}
-            colorMap={{ 'Full-time': '#00C9B1', 'Part-time': '#38BDF8', 'Contract': '#A78BFA', 'Internship': '#FBBF24', 'Freelance': '#FB923C', 'Remote': '#4ADE80' }}
-          />
-        </div>
-      </div>
-
-      {/* About Me */}
-      <div style={card}>
-        <SectionHeader icon={<FileText size={18} color="#38BDF8" />} text="About Me (Optional)" />
-        <textarea value={form.bio} onChange={set('bio')} rows={5}
-          placeholder="Briefly describe your background, what you've built or achieved, and what kind of role you're looking for..."
-          style={{ ...inp('bio'), resize: 'vertical', lineHeight: 1.6, fontFamily: 'inherit' }}
-          onFocus={() => setFocused('bio')} onBlur={() => setFocused('')} />
-      </div>
-
-      {/* Error */}
-      {error && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px',
-          borderRadius: 12, marginBottom: 24,
-          background: 'rgba(239,68,68,0.08)', border: '1.5px solid rgba(239,68,68,0.3)',
-          color: '#FCA5A5', fontSize: 14,
-        }}>
-          <AlertCircle size={16} /> {error}
-        </div>
-      )}
-
-      {/* Submit */}
-      <button type="submit" style={{
-        width: '100%', padding: '18px', borderRadius: 14, fontSize: 17, fontWeight: 800,
-        cursor: 'pointer', border: 'none', color: '#0A1628',
-        background: 'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-        boxShadow: '0 4px 24px rgba(56,189,248,0.3)', transition: 'all 0.2s',
-      }}>
-        <Send size={18} /> Submit My Profile — Free
-      </button>
-    </form>
   )
 }
 
@@ -1093,7 +879,7 @@ export function PostJobClient() {
         fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900,
         lineHeight: 1.1, letterSpacing: '-0.03em', color: '#F0F4FF', marginBottom: 12,
       }}>
-        {role === 'seeker' ? 'Post Your Profile' : role === 'employer' ? 'Post a Job' : 'Join JobQuest'}
+        {role ? 'Post a Job' : 'Join JobQuest'}
         {!role && (
           <span style={{
             display: 'block',
@@ -1129,22 +915,8 @@ export function PostJobClient() {
         {/* ── ROLE NOT CHOSEN YET ──────────────────────────────────────── */}
         {!role && <RoleSelector onSelect={setRole} />}
 
-        {/* ── JOB SEEKER ───────────────────────────────────────────────── */}
-        {role === 'seeker' && (
-          <>
-            <button onClick={handleBack} style={{
-              display: 'flex', alignItems: 'center', gap: 6, background: 'transparent',
-              border: 'none', color: '#8B9DC3', cursor: 'pointer', fontSize: 14,
-              marginBottom: 28, padding: 0,
-            }}>
-              <ArrowLeft size={15} /> Change role
-            </button>
-            <SeekerForm />
-          </>
-        )}
-
-        {/* ── EMPLOYER ─────────────────────────────────────────────────── */}
-        {role === 'employer' && (
+        {/* ── JOB SEEKER or EMPLOYER (same form) ───────────────────────── */}
+        {(role === 'seeker' || role === 'employer') && (
           <>
             {/* back + tab switcher */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
