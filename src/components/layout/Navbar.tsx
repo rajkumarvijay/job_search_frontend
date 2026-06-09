@@ -187,8 +187,6 @@ export function Navbar() {
         {/* Right */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <NavLink href="/" icon={Home} label="Home" active={path === '/'} />
-          <ExploreDropdown path={path} />
-          <PlanBadge />
 
           {/* Clerk auth controls */}
           <Show when="signed-out">
