@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Briefcase, Search, Bookmark, Sparkles, Crown,
-  FileText, Home, PlusCircle, ChevronDown,
+  FileText, Home, PlusCircle, ChevronDown, LayoutDashboard,
 } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs'
@@ -218,6 +218,7 @@ export function Navbar() {
             </SignUpButton>
           </Show>
           <Show when="signed-in">
+            <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={path === '/dashboard'} />
             <UserButton
               appearance={{
                 elements: {
