@@ -98,6 +98,30 @@ export default function DashboardPage() {
     <div style={{ background: '#0A1628', minHeight: '100vh', padding: '48px 24px 80px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
+        {/* ── Back button ────────────────────────────────────────────── */}
+        <button
+          onClick={() => router.back()}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            marginBottom: 28, padding: '8px 16px', borderRadius: 10,
+            background: 'transparent', border: '1px solid #1E3A5F',
+            color: '#8B9DC3', fontSize: 14, fontWeight: 500, cursor: 'pointer',
+            transition: 'all 0.18s',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.borderColor = '#4A6FA5'
+            el.style.color = '#F0F4FF'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.borderColor = '#1E3A5F'
+            el.style.color = '#8B9DC3'
+          }}
+        >
+          <ArrowLeft size={15} /> Back
+        </button>
+
         {/* ── Page title ─────────────────────────────────────────────── */}
         <div style={{ marginBottom: 36 }}>
           <div style={{
