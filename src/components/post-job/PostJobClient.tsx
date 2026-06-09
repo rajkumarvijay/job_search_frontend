@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, FormEvent, useCallback } from 'react'
+import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Briefcase, MapPin, DollarSign, FileText, Mail,
   CheckCircle2, AlertCircle, ChevronRight, Sparkles,
   Users, Globe, PlusCircle, ListChecks,
   Pencil, Trash2, X, Search, Calendar, Building2,
+  UserCheck, ArrowLeft, Send,
 } from 'lucide-react'
 import { postJobApi } from '@/lib/api'
 import { INDIA_CITIES } from '@/lib/constants'
@@ -15,6 +16,7 @@ import type { PostedJobOut } from '@/types'
 /* ═══════════════════════════════════════════════════════════════════════════
    TYPES
 ═══════════════════════════════════════════════════════════════════════════ */
+type Role  = null | 'seeker' | 'employer'
 type Tab   = 'post' | 'manage'
 type Stage = 'idle' | 'submitting' | 'success'
 
@@ -26,12 +28,22 @@ interface FormData {
   apply_url: string; company_url: string
 }
 
+interface SeekerData {
+  name: string; email: string; current_role: string; experience: string
+  location: string; skills: string; open_to: string[]; portfolio_url: string; bio: string
+}
+
 const EMPTY: FormData = {
   title: '', company: '', location: 'India', customLocation: '',
   job_type: 'Full-time', work_mode: 'On-site', experience: 'Any',
   min_salary: '', max_salary: '', salary_currency: 'INR',
   description: '', skills: '', contact_email: '',
   apply_url: '', company_url: '',
+}
+
+const EMPTY_SEEKER: SeekerData = {
+  name: '', email: '', current_role: '', experience: 'Any',
+  location: 'India', skills: '', open_to: ['Full-time'], portfolio_url: '', bio: '',
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -89,6 +101,331 @@ function PillGroup({
   )
 }
 
+function MultiPillGroup({
+  options, values, onChange, colorMap,
+}: {
+  options: string[]; values: string[]; onChange: (v: string[]) => void; colorMap?: Record<string, string>
+}) {
+  function toggle(opt: string) {
+    onChange(values.includes(opt) ? values.filter(v => v !== opt) : [...values, opt])
+  }
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      {options.map(opt => {
+        const active = values.includes(opt)
+        const color = colorMap?.[opt] ?? '#00C9B1'
+        return (
+          <button key={opt} type="button" onClick={() => toggle(opt)} style={{
+            padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', transition: 'all 0.18s',
+            border: `1.5px solid ${active ? color : '#1E3A5F'}`,
+            background: active ? `${color}18` : 'transparent',
+            color: active ? color : '#8B9DC3',
+          }}>{opt}</button>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROLE SELECTOR  (landing screen)
+═══════════════════════════════════════════════════════════════════════════ */
+function RoleSelector({ onSelect }: { onSelect: (r: 'seeker' | 'employer') => void }) {
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <p style={{ color: '#8B9DC3', fontSize: 16, marginBottom: 40, maxWidth: 460, margin: '0 auto 40px' }}>
+        Tell us who you are so we can show you the right experience.
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, maxWidth: 680, margin: '0 auto' }}>
+
+        {/* Job Seeker card */}
+        <button
+          onClick={() => onSelect('seeker')}
+          style={{
+            background: 'linear-gradient(135deg, rgba(56,189,248,0.08) 0%, rgba(10,22,40,0.9) 100%)',
+            border: '1.5px solid rgba(56,189,248,0.25)',
+            borderRadius: 20, padding: '36px 28px',
+            cursor: 'pointer', textAlign: 'left', transition: 'all 0.22s',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.borderColor = '#38BDF8'
+            el.style.transform = 'translateY(-4px)'
+            el.style.boxShadow = '0 16px 40px rgba(56,189,248,0.15)'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.borderColor = 'rgba(56,189,248,0.25)'
+            el.style.transform = 'translateY(0)'
+            el.style.boxShadow = 'none'
+          }}
+        >
+          <div style={{
+            width: 56, height: 56, borderRadius: 16,
+            background: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+          }}>
+            <UserCheck size={26} color="#38BDF8" />
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: '#F0F4FF', marginBottom: 10, letterSpacing: '-0.02em' }}>
+            I&apos;m a Job Seeker
+          </div>
+          <div style={{ fontSize: 14, color: '#8B9DC3', lineHeight: 1.65, marginBottom: 20 }}>
+            Post your profile and availability. Let employers discover you — share your skills, experience, and what you&apos;re looking for.
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {['Share your skills & experience', 'Get discovered by top employers', 'Set your preferred work mode & location'].map(pt => (
+              <div key={pt} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64A8D4' }}>
+                <CheckCircle2 size={13} color="#38BDF8" /> {pt}
+              </div>
+            ))}
+          </div>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            marginTop: 24, padding: '9px 18px', borderRadius: 10,
+            background: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.3)',
+            color: '#38BDF8', fontSize: 13, fontWeight: 700,
+          }}>
+            Post My Profile <ChevronRight size={14} />
+          </div>
+        </button>
+
+        {/* Employer card */}
+        <button
+          onClick={() => onSelect('employer')}
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,201,177,0.08) 0%, rgba(10,22,40,0.9) 100%)',
+            border: '1.5px solid rgba(0,201,177,0.25)',
+            borderRadius: 20, padding: '36px 28px',
+            cursor: 'pointer', textAlign: 'left', transition: 'all 0.22s',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.borderColor = '#00C9B1'
+            el.style.transform = 'translateY(-4px)'
+            el.style.boxShadow = '0 16px 40px rgba(0,201,177,0.15)'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.borderColor = 'rgba(0,201,177,0.25)'
+            el.style.transform = 'translateY(0)'
+            el.style.boxShadow = 'none'
+          }}
+        >
+          <div style={{
+            width: 56, height: 56, borderRadius: 16,
+            background: 'rgba(0,201,177,0.12)', border: '1px solid rgba(0,201,177,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+          }}>
+            <Building2 size={26} color="#00C9B1" />
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: '#F0F4FF', marginBottom: 10, letterSpacing: '-0.02em' }}>
+            I&apos;m an Employer
+          </div>
+          <div style={{ fontSize: 14, color: '#8B9DC3', lineHeight: 1.65, marginBottom: 20 }}>
+            Post a job listing for free and reach thousands of active candidates across India in minutes.
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {['Reach 485K+ active job seekers', 'Free listing — no account needed', 'Edit or remove your post anytime'].map(pt => (
+              <div key={pt} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#5ABFB0' }}>
+                <CheckCircle2 size={13} color="#00C9B1" /> {pt}
+              </div>
+            ))}
+          </div>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            marginTop: 24, padding: '9px 18px', borderRadius: 10,
+            background: 'rgba(0,201,177,0.12)', border: '1px solid rgba(0,201,177,0.3)',
+            color: '#00C9B1', fontSize: 13, fontWeight: 700,
+          }}>
+            Post a Job <ChevronRight size={14} />
+          </div>
+        </button>
+
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   JOB SEEKER FORM
+═══════════════════════════════════════════════════════════════════════════ */
+function SeekerForm() {
+  const [form, setForm] = useState<SeekerData>(EMPTY_SEEKER)
+  const [stage, setStage] = useState<Stage>('idle')
+  const [error, setError] = useState('')
+  const [focused, setFocused] = useState('')
+
+  const set = (key: keyof SeekerData) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm(p => ({ ...p, [key]: e.target.value }))
+  const setVal = (key: keyof SeekerData) => (v: string) => setForm(p => ({ ...p, [key]: v }))
+
+  const inp = (field: string): React.CSSProperties => ({
+    ...baseInput, borderColor: focused === field ? '#38BDF8' : '#1E3A5F',
+  })
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setError('')
+    if (!form.name.trim())   return setError('Your name is required.')
+    if (!form.email.trim())  return setError('Email address is required.')
+    if (!form.skills.trim()) return setError('Please list at least one skill.')
+    if (form.open_to.length === 0) return setError('Select at least one job type you are open to.')
+    // Simulate success (profile storage would be wired to backend separately)
+    setStage('success')
+  }
+
+  if (stage === 'success') {
+    return (
+      <div style={{
+        minHeight: '50vh', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', padding: '40px 24px',
+      }}>
+        <div style={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: '50%',
+            background: 'rgba(56,189,248,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 28px',
+            boxShadow: '0 0 32px rgba(56,189,248,0.2)',
+          }}>
+            <CheckCircle2 size={40} color="#38BDF8" />
+          </div>
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: '#F0F4FF', marginBottom: 12 }}>
+            Profile Submitted!
+          </h2>
+          <p style={{ color: '#8B9DC3', fontSize: 15, lineHeight: 1.7, marginBottom: 28 }}>
+            Thanks, <strong style={{ color: '#38BDF8' }}>{form.name}</strong>! Your profile has been received. Employers matching your skills and preferences will be able to reach you at <strong style={{ color: '#F0F4FF' }}>{form.email}</strong>.
+          </p>
+          <button
+            onClick={() => { setForm(EMPTY_SEEKER); setStage('idle') }}
+            style={{
+              padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 700,
+              background: 'rgba(56,189,248,0.1)', border: '1.5px solid rgba(56,189,248,0.3)',
+              color: '#38BDF8', cursor: 'pointer',
+            }}
+          >
+            Submit Another Profile
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} noValidate>
+
+      {/* Personal Info */}
+      <div style={card}>
+        <SectionHeader icon={<UserCheck size={18} color="#38BDF8" />} text="Personal Information" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <label style={labelStyle}>Full Name *</label>
+            <input value={form.name} onChange={set('name')} required
+              placeholder="e.g. Priya Sharma" style={inp('name')}
+              onFocus={() => setFocused('name')} onBlur={() => setFocused('')} />
+          </div>
+          <div>
+            <label style={labelStyle}>Email Address *</label>
+            <input type="email" value={form.email} onChange={set('email')} required
+              placeholder="priya@example.com" style={inp('email')}
+              onFocus={() => setFocused('email')} onBlur={() => setFocused('')} />
+          </div>
+          <div>
+            <label style={labelStyle}>Current / Recent Role</label>
+            <input value={form.current_role} onChange={set('current_role')}
+              placeholder="e.g. Frontend Developer" style={inp('current_role')}
+              onFocus={() => setFocused('current_role')} onBlur={() => setFocused('')} />
+          </div>
+          <div>
+            <label style={labelStyle}>Portfolio / LinkedIn URL</label>
+            <input type="url" value={form.portfolio_url} onChange={set('portfolio_url')}
+              placeholder="https://linkedin.com/in/yourname" style={inp('portfolio_url')}
+              onFocus={() => setFocused('portfolio_url')} onBlur={() => setFocused('')} />
+          </div>
+        </div>
+      </div>
+
+      {/* Experience & Location */}
+      <div style={card}>
+        <SectionHeader icon={<MapPin size={18} color="#38BDF8" />} text="Experience & Location" />
+        <div style={{ marginBottom: 24 }}>
+          <label style={labelStyle}>Years of Experience</label>
+          <PillGroup
+            options={['Fresher', '1-3 years', '3-5 years', '5-8 years', '8+ years']}
+            value={form.experience} onChange={setVal('experience')}
+            colorMap={{ 'Fresher': '#38BDF8', '1-3 years': '#00C9B1', '3-5 years': '#A78BFA', '5-8 years': '#FBBF24', '8+ years': '#FB923C' }}
+          />
+        </div>
+        <div>
+          <label style={labelStyle}>Preferred Location</label>
+          <select value={form.location} onChange={set('location')}
+            style={{ ...inp('location'), cursor: 'pointer' }}
+            onFocus={() => setFocused('location')} onBlur={() => setFocused('')}>
+            {INDIA_CITIES.map(c => <option key={c} value={c} style={{ background: '#0A1628' }}>{c}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Skills & Availability */}
+      <div style={card}>
+        <SectionHeader icon={<Sparkles size={18} color="#A78BFA" />} text="Skills & Availability" />
+        <div style={{ marginBottom: 24 }}>
+          <label style={labelStyle}>Key Skills * (comma-separated)</label>
+          <input value={form.skills} onChange={set('skills')} required
+            placeholder="e.g. React, Python, AWS, Product Management"
+            style={inp('skills')}
+            onFocus={() => setFocused('skills')} onBlur={() => setFocused('')} />
+        </div>
+        <div>
+          <label style={labelStyle}>Open To (select all that apply) *</label>
+          <MultiPillGroup
+            options={['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance', 'Remote']}
+            values={form.open_to}
+            onChange={v => setForm(p => ({ ...p, open_to: v }))}
+            colorMap={{ 'Full-time': '#00C9B1', 'Part-time': '#38BDF8', 'Contract': '#A78BFA', 'Internship': '#FBBF24', 'Freelance': '#FB923C', 'Remote': '#4ADE80' }}
+          />
+        </div>
+      </div>
+
+      {/* About Me */}
+      <div style={card}>
+        <SectionHeader icon={<FileText size={18} color="#38BDF8" />} text="About Me (Optional)" />
+        <textarea value={form.bio} onChange={set('bio')} rows={5}
+          placeholder="Briefly describe your background, what you've built or achieved, and what kind of role you're looking for..."
+          style={{ ...inp('bio'), resize: 'vertical', lineHeight: 1.6, fontFamily: 'inherit' }}
+          onFocus={() => setFocused('bio')} onBlur={() => setFocused('')} />
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px',
+          borderRadius: 12, marginBottom: 24,
+          background: 'rgba(239,68,68,0.08)', border: '1.5px solid rgba(239,68,68,0.3)',
+          color: '#FCA5A5', fontSize: 14,
+        }}>
+          <AlertCircle size={16} /> {error}
+        </div>
+      )}
+
+      {/* Submit */}
+      <button type="submit" style={{
+        width: '100%', padding: '18px', borderRadius: 14, fontSize: 17, fontWeight: 800,
+        cursor: 'pointer', border: 'none', color: '#0A1628',
+        background: 'linear-gradient(135deg, #38BDF8 0%, #818CF8 100%)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+        boxShadow: '0 4px 24px rgba(56,189,248,0.3)', transition: 'all 0.2s',
+      }}>
+        <Send size={18} /> Submit My Profile — Free
+      </button>
+    </form>
+  )
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    JOB FORM  (create + edit)
 ═══════════════════════════════════════════════════════════════════════════ */
@@ -99,8 +436,8 @@ function JobForm({
   onSuccess,
 }: {
   initialData?: FormData
-  editJobId?: string        // set when editing
-  ownerEmail?: string       // set when editing
+  editJobId?: string
+  ownerEmail?: string
   onSuccess: (jobId: string, title: string) => void
 }) {
   const [form, setForm] = useState<FormData>(initialData)
@@ -146,11 +483,9 @@ function JobForm({
       }
 
       if (editJobId && ownerEmail) {
-        // EDIT mode
         await postJobApi.update(editJobId, { ...payload, owner_email: ownerEmail })
         onSuccess(editJobId, form.title)
       } else {
-        // CREATE mode
         const { data } = await postJobApi.submit(payload)
         onSuccess(data.job_id ?? '', form.title)
       }
@@ -294,7 +629,7 @@ function JobForm({
               title={editJobId ? 'Email cannot be changed' : ''} />
             {editJobId && (
               <p style={{ fontSize: 12, color: '#4A6FA5', marginTop: 6 }}>
-                Email is locked — it's used to verify ownership.
+                Email is locked — it&apos;s used to verify ownership.
               </p>
             )}
           </div>
@@ -472,7 +807,6 @@ function MyListings() {
   function handleEditSuccess(jobId: string, title: string) {
     setEditJob(null)
     setEditSuccess(`"${title}" updated successfully.`)
-    // re-fetch
     postJobApi.byEmail(email).then(({ data }) => setJobs(data)).catch(() => {})
     setTimeout(() => setEditSuccess(''), 4000)
   }
@@ -482,7 +816,6 @@ function MyListings() {
     setJobs(prev => prev.filter(j => j.job_id !== deleteJob?.job_id))
   }
 
-  /* — Edit view — */
   if (editJob) {
     return (
       <div>
@@ -512,7 +845,6 @@ function MyListings() {
 
   return (
     <div>
-      {/* Email lookup */}
       <div style={card}>
         <SectionHeader icon={<Search size={18} color="#38BDF8" />} text="Find My Job Listings" />
         <p style={{ color: '#8B9DC3', fontSize: 14, marginBottom: 20, marginTop: -8 }}>
@@ -537,16 +869,12 @@ function MyListings() {
           </button>
         </form>
         {err && (
-          <div style={{
-            marginTop: 14, display: 'flex', alignItems: 'center', gap: 8,
-            color: '#FCA5A5', fontSize: 13,
-          }}>
+          <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, color: '#FCA5A5', fontSize: 13 }}>
             <AlertCircle size={14} /> {err}
           </div>
         )}
       </div>
 
-      {/* Edit success toast */}
       {editSuccess && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px',
@@ -558,13 +886,9 @@ function MyListings() {
         </div>
       )}
 
-      {/* Results */}
       {fetched && (
         jobs.length === 0 ? (
-          <div style={{
-            textAlign: 'center', padding: '48px 24px',
-            color: '#8B9DC3', fontSize: 15,
-          }}>
+          <div style={{ textAlign: 'center', padding: '48px 24px', color: '#8B9DC3', fontSize: 15 }}>
             <ListChecks size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
             <p>No active listings found for <strong>{email}</strong></p>
             <p style={{ fontSize: 13, color: '#4A6FA5' }}>
@@ -587,7 +911,6 @@ function MyListings() {
         )
       )}
 
-      {/* Delete modal */}
       {deleteJob && (
         <DeleteModal
           job={deleteJob} email={email}
@@ -606,7 +929,6 @@ function JobManageCard({
   const salaryText = job.min_salary
     ? `${job.salary_currency ?? 'INR'} ${job.min_salary}${job.max_salary ? `–${job.max_salary}` : '+'} LPA`
     : null
-
   const postedDate = job.posted_at
     ? new Date(job.posted_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     : null
@@ -614,20 +936,15 @@ function JobManageCard({
   return (
     <div style={{
       background: '#0F2044', border: '1px solid #1E3A5F',
-      borderRadius: 16, padding: '24px', marginBottom: 16,
-      transition: 'border-color 0.2s',
+      borderRadius: 16, padding: '24px', marginBottom: 16, transition: 'border-color 0.2s',
     }}>
-      {/* Top row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#F0F4FF' }}>
-            {job.title}
-          </h3>
+          <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700, color: '#F0F4FF' }}>{job.title}</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#8B9DC3', fontSize: 14 }}>
             <Building2 size={13} /> {job.company}
           </div>
         </div>
-        {/* Action buttons */}
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           <button onClick={onEdit} style={{
             display: 'flex', alignItems: 'center', gap: 6,
@@ -647,8 +964,6 @@ function JobManageCard({
           </button>
         </div>
       </div>
-
-      {/* Meta row */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 14 }}>
         {job.location && (
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#8B9DC3' }}>
@@ -665,15 +980,12 @@ function JobManageCard({
           </span>
         )}
       </div>
-
-      {/* Skills */}
       {job.skills && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
           {job.skills.split(',').slice(0, 6).map(s => s.trim()).filter(Boolean).map(s => (
             <span key={s} style={{
               padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600,
-              background: 'rgba(255,255,255,0.04)', border: '1px solid #1E3A5F',
-              color: '#8B9DC3',
+              background: 'rgba(255,255,255,0.04)', border: '1px solid #1E3A5F', color: '#8B9DC3',
             }}>{s}</span>
           ))}
         </div>
@@ -692,7 +1004,7 @@ function Chip({ text, color }: { text: string; color: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SUCCESS SCREEN
+   SUCCESS SCREEN  (employer)
 ═══════════════════════════════════════════════════════════════════════════ */
 function SuccessScreen({
   jobId, title, onReset,
@@ -708,8 +1020,7 @@ function SuccessScreen({
           width: 80, height: 80, borderRadius: '50%',
           background: 'rgba(0,201,177,0.12)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 28px',
-          boxShadow: '0 0 32px rgba(0,201,177,0.2)',
+          margin: '0 auto 28px', boxShadow: '0 0 32px rgba(0,201,177,0.2)',
         }}>
           <CheckCircle2 size={40} color="#00C9B1" />
         </div>
@@ -751,91 +1062,130 @@ function SuccessScreen({
    ROOT PAGE COMPONENT
 ═══════════════════════════════════════════════════════════════════════════ */
 export function PostJobClient() {
+  const [role, setRole] = useState<Role>(null)
   const [tab, setTab] = useState<Tab>('post')
   const [successJobId, setSuccessJobId] = useState('')
   const [successTitle, setSuccessTitle] = useState('')
 
   function handlePostSuccess(jobId: string, title: string) {
-    setSuccessJobId(jobId)
-    setSuccessTitle(title)
+    setSuccessJobId(jobId); setSuccessTitle(title)
+  }
+  function handleReset() {
+    setSuccessJobId(''); setSuccessTitle('')
+  }
+  function handleBack() {
+    setRole(null); handleReset(); setTab('post')
   }
 
-  function handleReset() {
-    setSuccessJobId('')
-    setSuccessTitle('')
-  }
+  /* ── page header (shared) ─────────────────────────────────────────── */
+  const pageHeader = (
+    <div style={{ textAlign: 'center', marginBottom: role ? 32 : 48 }}>
+      <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        padding: '7px 18px', borderRadius: 999,
+        background: 'rgba(0,201,177,0.08)', border: '1px solid rgba(0,201,177,0.25)',
+        color: '#00C9B1', fontSize: 13, fontWeight: 600, marginBottom: 20,
+      }}>
+        <Sparkles size={13} fill="#00C9B1" />
+        Free · No Account Needed
+      </div>
+      <h1 style={{
+        fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900,
+        lineHeight: 1.1, letterSpacing: '-0.03em', color: '#F0F4FF', marginBottom: 12,
+      }}>
+        {role === 'seeker' ? 'Post Your Profile' : role === 'employer' ? 'Post a Job' : 'Join JobQuest'}
+        {!role && (
+          <span style={{
+            display: 'block',
+            background: 'linear-gradient(90deg, #00C9B1, #38BDF8)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          }}>
+            as Seeker or Employer
+          </span>
+        )}
+      </h1>
+      {!role && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 36, flexWrap: 'wrap', marginTop: 8 }}>
+          {[
+            { icon: <Users size={13} color="#00C9B1" />, text: '485K+ Job Seekers' },
+            { icon: <Globe size={13} color="#38BDF8" />, text: '45+ Cities' },
+            { icon: <Briefcase size={13} color="#A78BFA" />, text: '6 Portals · 1 Post' },
+          ].map(({ icon, text }) => (
+            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#8B9DC3', fontSize: 13 }}>
+              {icon} {text}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <div style={{ background: '#0A1628', minHeight: '100vh', padding: '48px 24px 80px' }}>
       <div style={{ maxWidth: 780, margin: '0 auto' }}>
 
-        {/* Page header */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '7px 18px', borderRadius: 999,
-            background: 'rgba(0,201,177,0.08)', border: '1px solid rgba(0,201,177,0.25)',
-            color: '#00C9B1', fontSize: 13, fontWeight: 600, marginBottom: 20,
-          }}>
-            <Sparkles size={13} fill="#00C9B1" />
-            Free Job Posting · No Account Needed
-          </div>
-          <h1 style={{
-            fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900,
-            lineHeight: 1.1, letterSpacing: '-0.03em', color: '#F0F4FF', marginBottom: 12,
-          }}>
-            Post a Job on{' '}
-            <span style={{
-              background: 'linear-gradient(90deg, #00C9B1, #38BDF8)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>JobQuest</span>
-          </h1>
-          <p style={{ color: '#8B9DC3', fontSize: 16, maxWidth: 460, margin: '0 auto 24px' }}>
-            Reach thousands of active job seekers across India — completely free.
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 36, flexWrap: 'wrap' }}>
-            {[
-              { icon: <Users size={13} color="#00C9B1" />, text: '485K+ Job Seekers' },
-              { icon: <Globe size={13} color="#38BDF8" />, text: '45+ Cities' },
-              { icon: <Briefcase size={13} color="#A78BFA" />, text: '6 Portals · 1 Post' },
-            ].map(({ icon, text }) => (
-              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#8B9DC3', fontSize: 13 }}>
-                {icon} {text}
-              </div>
-            ))}
-          </div>
-        </div>
+        {pageHeader}
 
-        {/* Tab switcher */}
-        <div style={{
-          display: 'flex', gap: 4, marginBottom: 32,
-          background: '#0F2044', border: '1px solid #1E3A5F',
-          borderRadius: 14, padding: 4,
-        }}>
-          {([
-            { key: 'post',   icon: <PlusCircle size={15} />,   label: 'Post a Job' },
-            { key: 'manage', icon: <ListChecks size={15} />,   label: 'My Listings' },
-          ] as { key: Tab; icon: React.ReactNode; label: string }[]).map(({ key, icon, label }) => (
-            <button key={key} onClick={() => { setTab(key); handleReset() }} style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '12px', borderRadius: 10, fontSize: 14, fontWeight: 600,
-              border: 'none', cursor: 'pointer', transition: 'all 0.2s',
-              background: tab === key ? 'linear-gradient(135deg, rgba(0,201,177,0.15), rgba(14,165,233,0.15))' : 'transparent',
-              color: tab === key ? '#00C9B1' : '#8B9DC3',
-              boxShadow: tab === key ? 'inset 0 0 0 1.5px rgba(0,201,177,0.3)' : 'none',
+        {/* ── ROLE NOT CHOSEN YET ──────────────────────────────────────── */}
+        {!role && <RoleSelector onSelect={setRole} />}
+
+        {/* ── JOB SEEKER ───────────────────────────────────────────────── */}
+        {role === 'seeker' && (
+          <>
+            <button onClick={handleBack} style={{
+              display: 'flex', alignItems: 'center', gap: 6, background: 'transparent',
+              border: 'none', color: '#8B9DC3', cursor: 'pointer', fontSize: 14,
+              marginBottom: 28, padding: 0,
             }}>
-              {icon} {label}
+              <ArrowLeft size={15} /> Change role
             </button>
-          ))}
-        </div>
-
-        {/* Tab content */}
-        {tab === 'post' && (
-          successJobId
-            ? <SuccessScreen jobId={successJobId} title={successTitle} onReset={handleReset} />
-            : <JobForm onSuccess={handlePostSuccess} />
+            <SeekerForm />
+          </>
         )}
-        {tab === 'manage' && <MyListings />}
+
+        {/* ── EMPLOYER ─────────────────────────────────────────────────── */}
+        {role === 'employer' && (
+          <>
+            {/* back + tab switcher */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+              <button onClick={handleBack} style={{
+                display: 'flex', alignItems: 'center', gap: 6, background: 'transparent',
+                border: 'none', color: '#8B9DC3', cursor: 'pointer', fontSize: 14, padding: 0, flexShrink: 0,
+              }}>
+                <ArrowLeft size={15} /> Change role
+              </button>
+
+              <div style={{
+                flex: 1, display: 'flex', gap: 4,
+                background: '#0F2044', border: '1px solid #1E3A5F',
+                borderRadius: 14, padding: 4,
+              }}>
+                {([
+                  { key: 'post',   icon: <PlusCircle size={15} />, label: 'Post a Job' },
+                  { key: 'manage', icon: <ListChecks size={15} />, label: 'My Listings' },
+                ] as { key: Tab; icon: React.ReactNode; label: string }[]).map(({ key, icon, label }) => (
+                  <button key={key} onClick={() => { setTab(key); handleReset() }} style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    padding: '12px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                    border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                    background: tab === key ? 'linear-gradient(135deg, rgba(0,201,177,0.15), rgba(14,165,233,0.15))' : 'transparent',
+                    color: tab === key ? '#00C9B1' : '#8B9DC3',
+                    boxShadow: tab === key ? 'inset 0 0 0 1.5px rgba(0,201,177,0.3)' : 'none',
+                  }}>
+                    {icon} {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {tab === 'post' && (
+              successJobId
+                ? <SuccessScreen jobId={successJobId} title={successTitle} onReset={handleReset} />
+                : <JobForm onSuccess={handlePostSuccess} />
+            )}
+            {tab === 'manage' && <MyListings />}
+          </>
+        )}
 
       </div>
 
