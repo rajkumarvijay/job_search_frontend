@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { Upload, Zap, ArrowRight, Shield, BarChart3, Lightbulb, Target } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowRight, Shield, BarChart3, Lightbulb, Target, CheckCircle2 } from 'lucide-react'
 
 const FEATURES = [
   { icon: Shield,    label: 'ATS Score',         desc: 'Instant 0–100 compatibility rating',  color: '#00C9B1' },
@@ -11,27 +10,15 @@ const FEATURES = [
   { icon: Target,    label: 'Job Matches',        desc: 'AI-curated roles for your profile',   color: '#4ADE80' },
 ]
 
+const KEY_POINTS = [
+  { text: 'Over 90 % of recruiters use ATS software — a low score means your resume is filtered out before any human reads it.' },
+  { text: 'Get a detailed section-by-section breakdown: contact info, summary, experience, skills, education, and keyword density.' },
+  { text: 'Receive a prioritised fix list — high-impact changes first — so you spend time on what actually moves the needle.' },
+  { text: 'AI matches your profile to live job listings and surfaces roles where your resume is already a strong fit.' },
+  { text: 'Supports PDF, DOCX, and TXT formats. Analysis completes in under 30 seconds, powered by Gemini AI.' },
+]
+
 export function ResumeSection() {
-  const router  = useRouter()
-  const fileRef = useRef<HTMLInputElement>(null)
-
-  const handleFile = (file: File | undefined) => {
-    if (!file) return
-    // Store the file in sessionStorage (as base64) and navigate to /resume
-    const reader = new FileReader()
-    reader.onload = () => {
-      try {
-        sessionStorage.setItem('pending_resume_name', file.name)
-        sessionStorage.setItem('pending_resume_type', file.type)
-        sessionStorage.setItem('pending_resume_data', reader.result as string)
-      } catch {
-        /* sessionStorage might be full — just navigate */
-      }
-      router.push('/resume')
-    }
-    reader.readAsDataURL(file)
-  }
-
   return (
     <section style={{ padding: '80px 24px' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -39,7 +26,7 @@ export function ResumeSection() {
         {/* header */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <div className="sec-label">AI-Powered</div>
-          <h2 className="sec-title">Resume Score & Recommendations</h2>
+          <h2 className="sec-title">Resume Score &amp; Recommendations</h2>
           <p className="sec-sub">
             Upload your resume and get an instant ATS score, improvement tips, and personalised job matches — all powered by Gemini AI.
           </p>
@@ -48,53 +35,41 @@ export function ResumeSection() {
         {/* two-col layout */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 24, alignItems: 'center' }}>
 
-          {/* upload card */}
+          {/* key points card */}
           <div style={{
             background: 'linear-gradient(135deg,rgba(0,201,177,0.06) 0%,rgba(167,139,250,0.04) 100%)',
             border: '1px solid rgba(0,201,177,0.2)',
-            borderRadius: 24, padding: 36, textAlign: 'center',
+            borderRadius: 24, padding: 36,
           }}>
-            <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(0,201,177,0.1)', border: '1px solid rgba(0,201,177,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-              <Zap size={32} color="#00C9B1" />
-            </div>
-
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: '#F0F4FF', marginBottom: 10, letterSpacing: '-0.02em' }}>
-              Analyse Your Resume Free
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#F0F4FF', marginBottom: 6, letterSpacing: '-0.02em' }}>
+              Why your ATS score matters
             </h3>
-            <p style={{ fontSize: 14, color: '#8B9DC3', lineHeight: 1.65, marginBottom: 28, maxWidth: 340, margin: '0 auto 28px' }}>
-              Drop your PDF or DOCX and get a detailed ATS report in under 30 seconds.
+            <p style={{ fontSize: 13, color: '#8B9DC3', marginBottom: 28, lineHeight: 1.6 }}>
+              Most applications are rejected automatically — before a recruiter ever sees them. Here&apos;s what our analyser checks:
             </p>
 
-            {/* drop / upload zone */}
-            <div
-              onClick={() => fileRef.current?.click()}
-              onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLDivElement).style.borderColor = '#00C9B1' }}
-              onDragLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,201,177,0.25)' }}
-              onDrop={e => {
-                e.preventDefault()
-                ;(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,201,177,0.25)'
-                handleFile(e.dataTransfer.files[0])
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {KEY_POINTS.map((pt, i) => (
+                <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <CheckCircle2 size={17} color="#00C9B1" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span style={{ fontSize: 13, color: '#A8C0E0', lineHeight: 1.65 }}>{pt.text}</span>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/resume"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '12px 22px', borderRadius: 12, textDecoration: 'none',
+                background: '#00C9B1', color: '#0A1628', fontWeight: 700, fontSize: 14,
+                transition: 'opacity 0.18s',
               }}
-              style={{ border: '2px dashed rgba(0,201,177,0.25)', borderRadius: 14, padding: '28px 20px', cursor: 'pointer', transition: 'border-color 0.2s', marginBottom: 16 }}
-            >
-              <Upload size={22} color="#00C9B1" style={{ margin: '0 auto 10px' }} />
-              <p style={{ fontSize: 14, fontWeight: 600, color: '#F0F4FF', margin: '0 0 4px' }}>Drag & drop your resume</p>
-              <p style={{ fontSize: 12, color: '#8B9DC3', margin: 0 }}>PDF · DOCX · TXT · up to 5 MB</p>
-            </div>
-
-            <input
-              ref={fileRef} type="file" accept=".pdf,.docx,.txt" style={{ display: 'none' }}
-              onChange={e => handleFile(e.target.files?.[0])}
-            />
-
-            <button
-              onClick={() => router.push('/resume')}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '13px', borderRadius: 12, background: '#00C9B1', border: 'none', color: '#0A1628', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'opacity 0.18s' }}
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
             >
-              Open Resume Analyser <ArrowRight size={15} />
-            </button>
+              Analyse My Resume <ArrowRight size={15} />
+            </Link>
           </div>
 
           {/* feature grid */}
@@ -127,6 +102,7 @@ export function ResumeSection() {
               </div>
             ))}
           </div>
+
         </div>
       </div>
     </section>
