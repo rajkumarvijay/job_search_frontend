@@ -86,21 +86,6 @@ export interface SavedJob {
 
 export type Platform = 'linkedin' | 'indeed' | 'glassdoor' | 'naukri' | 'ziprecruiter' | 'google' | 'portal'
 
-export interface AuthUser {
-  id: number
-  name: string
-  email: string
-  auth_provider: string
-  avatar_url?: string | null
-  created_at: string
-}
-
-export interface TokenResponse {
-  access_token: string
-  token_type: string
-  user: AuthUser
-}
-
 export interface PostJobPayload {
   title: string
   company: string

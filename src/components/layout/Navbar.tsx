@@ -2,27 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import {
   Briefcase, Search, Bookmark, Sparkles, Crown,
   FileText, Home, PlusCircle, ChevronDown,
 } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
-
-/**
- * NavbarAuth contains useGoogleLogin from @react-oauth/google.
- * That package accesses document/window at module-load time, which crashes
- * Next.js SSR.  Wrapping with dynamic + ssr:false ensures it only runs in
- * the browser.
- */
-const NavbarAuth = dynamic(
-  () => import('@/components/layout/NavbarAuth'),
-  {
-    ssr: false,
-    loading: () => <div style={{ width: 88, height: 36 }} />,
-  }
-)
 
 /* ══════════════════════════════════════════════════════
    PLAN BADGE
@@ -203,9 +188,6 @@ export function Navbar() {
           <NavLink href="/" icon={Home} label="Home" active={path === '/'} />
           <ExploreDropdown path={path} />
           <PlanBadge />
-          {/* NavbarAuth is loaded client-side only (ssr:false) to avoid
-              @react-oauth/google crashing during Next.js server rendering */}
-          <NavbarAuth />
         </div>
       </div>
 
