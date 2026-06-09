@@ -1,3 +1,4 @@
+import {ClerkProvider} from '@clerk/nextjs';
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -27,11 +28,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen flex flex-col">
-        <Providers>
+        <ClerkProvider>
+          <Providers>
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
-        </Providers>
+          </Providers>
+        </ClerkProvider>
       </body>
     </html>
   )

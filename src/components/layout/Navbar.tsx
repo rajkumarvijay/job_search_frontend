@@ -8,6 +8,7 @@ import {
   FileText, Home, PlusCircle, ChevronDown,
 } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
+import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs'
 
 /* ══════════════════════════════════════════════════════
    PLAN BADGE
@@ -188,6 +189,43 @@ export function Navbar() {
           <NavLink href="/" icon={Home} label="Home" active={path === '/'} />
           <ExploreDropdown path={path} />
           <PlanBadge />
+
+          {/* Clerk auth controls */}
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button style={{
+                padding: '7px 16px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                cursor: 'pointer', border: '1px solid #1E3A5F',
+                background: 'transparent', color: '#8B9DC3', transition: 'all 0.18s',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#F0F4FF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#4A6FA5' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#8B9DC3'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#1E3A5F' }}
+              >
+                Sign In
+              </button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <button style={{
+                padding: '7px 16px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                cursor: 'pointer', border: '1px solid rgba(0,201,177,0.4)',
+                background: 'rgba(0,201,177,0.1)', color: '#00C9B1', transition: 'all 0.18s',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,201,177,0.18)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,201,177,0.1)' }}
+              >
+                Sign Up
+              </button>
+            </SignUpButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: { width: 34, height: 34 },
+                },
+              }}
+            />
+          </Show>
         </div>
       </div>
 
