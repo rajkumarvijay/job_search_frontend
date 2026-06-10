@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import Link from 'next/link'
 import {
   Mail, MessageSquare, Send, CheckCircle2, AlertCircle,
@@ -110,9 +110,23 @@ function FAQItem({ q, a }: { q: string; a: string }) {
    Main Page
 --------------------------------------------------------------------------- */
 export default function ContactPage() {
+  const RESET_DELAY = 4000 // ms to show success before auto-reset
+
   const [form, setForm]   = useState({ name: '', email: '', subject: SUBJECTS[0], message: '' })
   const [stage, setStage] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [focused, setFocused] = useState('')
+  const [sentName, setSentName] = useState('')
+  const [sentEmail, setSentEmail] = useState('')
+
+  // Auto-reset after success
+  useEffect(() => {
+    if (stage !== 'sent') return
+    const t = setTimeout(() => {
+      setForm({ name: '', email: '', subject: SUBJECTS[0], message: '' })
+      setStage('idle')
+    }, RESET_DELAY)
+    return () => clearTimeout(t)
+  }, [stage])
 
   const set = (k: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -129,8 +143,9 @@ export default function ContactPage() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return
+    setSentName(form.name)
+    setSentEmail(form.email)
     setStage('sending')
-    // Simulate network call
     setTimeout(() => setStage('sent'), 1800)
   }
 
@@ -217,17 +232,50 @@ export default function ContactPage() {
             </div>
 
             {stage === 'sent' ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <div style={{ width: 70, height: 70, borderRadius: '50%', background: 'rgba(74,222,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: '0 0 28px rgba(74,222,128,0.15)' }}>
-                  <CheckCircle2 size={34} color="#4ADE80" />
+              <div style={{ textAlign: 'center', padding: '36px 0' }}>
+                {/* Success icon */}
+                <div style={{
+                  width: 72, height: 72, borderRadius: '50%', margin: '0 auto 20px',
+                  background: 'rgba(74,222,128,0.12)', border: '2px solid rgba(74,222,128,0.35)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 0 32px rgba(74,222,128,0.18)',
+                  animation: 'popIn 0.35s cubic-bezier(.175,.885,.32,1.275)',
+                }}>
+                  <CheckCircle2 size={36} color="#4ADE80" />
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#F0F4FF', marginBottom: 10 }}>Message Sent!</div>
-                <p style={{ fontSize: 14, color: '#8B9DC3', lineHeight: 1.7, marginBottom: 28 }}>
-                  Thanks <strong style={{ color: '#F0F4FF' }}>{form.name}</strong>! We&apos;ll get back to you at <strong style={{ color: '#F0F4FF' }}>{form.email}</strong> within 24 hours.
+
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#F0F4FF', marginBottom: 10 }}>
+                  Message Sent!
+                </div>
+                <p style={{ fontSize: 14, color: '#8B9DC3', lineHeight: 1.75, marginBottom: 28 }}>
+                  Thanks <strong style={{ color: '#F0F4FF' }}>{sentName}</strong>! We&apos;ll reply to{' '}
+                  <strong style={{ color: '#F0F4FF' }}>{sentEmail}</strong> within 24 hours.
                 </p>
-                <button onClick={() => { setForm({ name: '', email: '', subject: SUBJECTS[0], message: '' }); setStage('idle') }}
-                  style={{ padding: '11px 24px', borderRadius: 10, background: 'rgba(0,201,177,0.1)', border: '1.5px solid rgba(0,201,177,0.3)', color: '#00C9B1', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                  Send Another
+
+                {/* Auto-reset countdown bar */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 12, color: '#4A6FA5', marginBottom: 8 }}>
+                    Form resets automatically in a moment…
+                  </div>
+                  <div style={{ height: 4, borderRadius: 999, background: '#1E3A5F', overflow: 'hidden', maxWidth: 240, margin: '0 auto' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 999,
+                      background: 'linear-gradient(90deg,#4ADE80,#00C9B1)',
+                      animation: `drainBar ${RESET_DELAY}ms linear forwards`,
+                    }} />
+                  </div>
+                </div>
+
+                {/* Manual reset option */}
+                <button
+                  onClick={() => { setForm({ name: '', email: '', subject: SUBJECTS[0], message: '' }); setStage('idle') }}
+                  style={{
+                    padding: '10px 22px', borderRadius: 10,
+                    background: 'rgba(0,201,177,0.08)', border: '1.5px solid rgba(0,201,177,0.25)',
+                    color: '#00C9B1', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  }}
+                >
+                  Send another message
                 </button>
               </div>
             ) : (
@@ -338,7 +386,11 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin    { to { transform: rotate(360deg); } }
+        @keyframes popIn   { from { opacity:0; transform:scale(0.6); } to { opacity:1; transform:scale(1); } }
+        @keyframes drainBar{ from { width:100%; } to { width:0%; } }
+      `}</style>
     </div>
   )
 }
