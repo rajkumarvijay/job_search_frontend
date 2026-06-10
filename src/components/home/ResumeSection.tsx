@@ -1,7 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { ArrowRight, Shield, BarChart3, Lightbulb, Target, CheckCircle2 } from 'lucide-react'
+import { Shield, BarChart3, Lightbulb, Target, CheckCircle2 } from 'lucide-react'
 
 const FEATURES = [
   { icon: Shield,    label: 'ATS Score',         desc: 'Instant 0–100 compatibility rating',  color: '#00C9B1' },
@@ -57,19 +56,26 @@ export function ResumeSection() {
               ))}
             </ul>
 
-            <Link
-              href="/resume"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '12px 22px', borderRadius: 12, textDecoration: 'none',
-                background: '#00C9B1', color: '#0A1628', fontWeight: 700, fontSize: 14,
-                transition: 'opacity 0.18s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-            >
-              Analyse My Resume <ArrowRight size={15} />
-            </Link>
+            {/* SEO trust signals */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              {[
+                '✅ Free ATS Resume Checker',
+                '🤖 Powered by Gemini AI',
+                '⚡ Results in 30 seconds',
+                '📄 PDF · DOCX · TXT',
+                '🔒 No sign-up required',
+                '🇮🇳 Optimised for Indian Job Market',
+              ].map(tag => (
+                <span key={tag} style={{
+                  padding: '6px 14px', borderRadius: 999,
+                  background: 'rgba(0,201,177,0.07)', border: '1px solid rgba(0,201,177,0.2)',
+                  fontSize: 12, fontWeight: 600, color: '#A8C0E0',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* feature grid */}
