@@ -281,7 +281,7 @@ export default function AboutPage() {
               <Code2 size={26} color="#00C9B1" />
             </div>
             <h3 style={{ fontSize: 24, fontWeight: 900, color: '#F0F4FF', marginBottom: 16, letterSpacing: '-0.03em' }}>
-              Built for Job Seekers, by Job Seekers
+              India&apos;s Smartest Free Job Search Platform — Powered by AI
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 32 }}>
               {TEAM_VALUES.map((v, i) => (
