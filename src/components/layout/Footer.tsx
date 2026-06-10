@@ -14,6 +14,7 @@ const EXPLORE_LINKS = [
 const COMPANY_LINKS = [
   { href: '/about',   label: 'About Us'   },
   { href: '/contact', label: 'Contact Us' },
+  { href: '/blog',    label: 'Blog'       },
 ]
 
 const LEGAL_LINKS = [
