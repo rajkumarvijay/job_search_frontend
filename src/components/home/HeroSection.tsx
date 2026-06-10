@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Zap, TrendingUp, Search, FileText } from 'lucide-react'
+import { Zap, Search, FileText } from 'lucide-react'
 
 const TRENDING_ROW_1 = [
   'Software Engineer', 'Data Scientist', 'Product Manager', 'DevOps Engineer',
@@ -147,16 +147,6 @@ export function HeroSection() {
 
       {/* Trending keywords — full width marquees */}
       <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-
-        {/* Section label */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 7, marginBottom: 20,
-          fontSize: 12, fontWeight: 700, color: '#4A6FA5',
-          textTransform: 'uppercase', letterSpacing: '0.1em',
-        }}>
-          <TrendingUp size={13} color="#4A6FA5" /> Trending job titles in India right now
-        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <TrendingMarquee items={TRENDING_ROW_1} />
