@@ -13,9 +13,9 @@ import { postJobApi } from '@/lib/api'
 import { INDIA_CITIES } from '@/lib/constants'
 import type { PostedJobOut } from '@/types'
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    TYPES
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 type Role  = null | 'seeker' | 'employer'
 type Tab   = 'post' | 'manage'
 type Stage = 'idle' | 'submitting' | 'success'
@@ -36,9 +36,9 @@ const EMPTY: FormData = {
   apply_url: '', company_url: '',
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    SHARED STYLE HELPERS
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 const card: React.CSSProperties = {
   background: '#0F2044', border: '1px solid #1E3A5F',
   borderRadius: 16, padding: '32px', marginBottom: 24,
@@ -91,9 +91,9 @@ function PillGroup({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    ROLE SELECTOR  (landing screen)
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 function RoleSelector({ onSelect }: { onSelect: (r: 'seeker' | 'employer') => void }) {
   return (
     <div style={{ textAlign: 'center' }}>
@@ -212,9 +212,9 @@ function RoleSelector({ onSelect }: { onSelect: (r: 'seeker' | 'employer') => vo
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    JOB FORM  (create + edit)
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 function JobForm({
   initialData = EMPTY,
   editJobId,
@@ -464,9 +464,9 @@ function JobForm({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    DELETE CONFIRM MODAL
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 function DeleteModal({
   job, email, onConfirm, onCancel,
 }: {
@@ -544,9 +544,9 @@ function DeleteModal({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    MY LISTINGS TAB
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 function MyListings() {
   const [email, setEmail] = useState('')
   const [inputEmail, setInputEmail] = useState('')
@@ -708,7 +708,7 @@ function MyListings() {
   )
 }
 
-/* ── Single job management card ─────────────────────────────────────────── */
+/* -- Single job management card ------------------------------------------- */
 function JobManageCard({
   job, onEdit, onDelete,
 }: { job: PostedJobOut; onEdit: () => void; onDelete: () => void }) {
@@ -789,9 +789,9 @@ function Chip({ text, color }: { text: string; color: string }) {
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    SUCCESS SCREEN  (employer)
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 function SuccessScreen({
   jobId, title, onReset,
 }: { jobId: string; title: string; onReset: () => void }) {
@@ -844,9 +844,9 @@ function SuccessScreen({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    ROOT PAGE COMPONENT
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 export function PostJobClient() {
   const [role, setRole] = useState<Role>(null)
   const [tab, setTab] = useState<Tab>('post')
@@ -863,7 +863,7 @@ export function PostJobClient() {
     setRole(null); handleReset(); setTab('post')
   }
 
-  /* ── page header (shared) ─────────────────────────────────────────── */
+  /* -- page header (shared) ------------------------------------------- */
   const pageHeader = (
     <div style={{ textAlign: 'center', marginBottom: role ? 32 : 48 }}>
       <div style={{
@@ -912,10 +912,10 @@ export function PostJobClient() {
 
         {pageHeader}
 
-        {/* ── ROLE NOT CHOSEN YET ──────────────────────────────────────── */}
+        {/* -- ROLE NOT CHOSEN YET ---------------------------------------- */}
         {!role && <RoleSelector onSelect={setRole} />}
 
-        {/* ── JOB SEEKER or EMPLOYER (same form) ───────────────────────── */}
+        {/* -- JOB SEEKER or EMPLOYER (same form) ------------------------- */}
         {(role === 'seeker' || role === 'employer') && (
           <>
             {/* back + tab switcher */}

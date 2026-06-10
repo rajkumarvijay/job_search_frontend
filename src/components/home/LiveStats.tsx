@@ -8,7 +8,7 @@ const FALLBACK = { total_active_jobs: 485000, top_salary_lpa: '55 LPA', platform
 /** Height of each digit tile in px — must be a fixed value for transform math */
 const DH = 52
 
-/* ── Single character slot ────────────────────────────────────────────── */
+/* -- Single character slot ---------------------------------------------- */
 function SlotChar({
   ch,
   index,
@@ -85,7 +85,7 @@ function SlotChar({
   )
 }
 
-/* ── Full number rendered as individual animated slots ───────────────── */
+/* -- Full number rendered as individual animated slots ----------------- */
 function SlotNumber({ display, color, active }: { display: string; color: string; active: boolean }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1 }}>
@@ -96,7 +96,7 @@ function SlotNumber({ display, color, active }: { display: string; color: string
   )
 }
 
-/* ── Stats definition ─────────────────────────────────────────────────── */
+/* -- Stats definition --------------------------------------------------- */
 const STATS = (s: typeof FALLBACK) => [
   { display: Math.round(s.total_active_jobs / 1000) + 'K+', label: 'Active Jobs', color: '#00C9B1' },
   { display: s.top_salary_lpa,                              label: 'Top Salary',  color: '#38BDF8' },
@@ -104,7 +104,7 @@ const STATS = (s: typeof FALLBACK) => [
   { display: s.cities_covered + '+',                        label: 'Cities',      color: '#FBBF24' },
 ]
 
-/* ── Section ──────────────────────────────────────────────────────────── */
+/* -- Section ------------------------------------------------------------ */
 export function LiveStats() {
   const { data } = usePortalStats()
   const s = data ?? FALLBACK

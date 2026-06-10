@@ -10,7 +10,7 @@ import {
 import { resumeApi } from '@/lib/api'
 import type { ResumeResult, Improvement, RecommendedJob } from '@/types'
 
-// ─── colour helpers ───────────────────────────────────────────────────────────
+// --- colour helpers -----------------------------------------------------------
 const scoreColor = (s: number) =>
   s >= 80 ? '#4ADE80' : s >= 65 ? '#00C9B1' : s >= 45 ? '#FBBF24' : s >= 30 ? '#FB923C' : '#F87171'
 
@@ -22,7 +22,7 @@ const gradeLabel: Record<string, string> = {
   'A+': 'Excellent', A: 'Very Good', B: 'Good', C: 'Average', D: 'Needs Work', F: 'Major Overhaul',
 }
 
-// ─── section max scores (must match backend prompt) ───────────────────────────
+// --- section max scores (must match backend prompt) ---------------------------
 const SECTION_MAX: Record<string, number> = {
   contact_info: 10, professional_summary: 15, work_experience: 30,
   skills: 20, education: 15, keywords_and_ats: 10,
@@ -33,7 +33,7 @@ const SECTION_LABEL: Record<string, string> = {
   education: 'Education', keywords_and_ats: 'Keywords & ATS',
 }
 
-// ─── tiny sub-components ─────────────────────────────────────────────────────
+// --- tiny sub-components -----------------------------------------------------
 function Tag({ children, color = '#00C9B1' }: { children: React.ReactNode; color?: string }) {
   return (
     <span style={{
@@ -87,7 +87,7 @@ function Accordion({
   )
 }
 
-// ─── Job Recommendation Card ──────────────────────────────────────────────────
+// --- Job Recommendation Card --------------------------------------------------
 function RecoJobCard({ job }: { job: RecommendedJob }) {
   const [hovered, setHovered] = useState(false)
   const salary = job.min_salary
@@ -156,7 +156,7 @@ function RecoJobCard({ job }: { job: RecommendedJob }) {
   )
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// --- Main Component -----------------------------------------------------------
 type Stage = 'idle' | 'loading' | 'result'
 
 export function ResumeAnalyzerClient() {
@@ -222,7 +222,7 @@ export function ResumeAnalyzerClient() {
     if (file) analyse(file)
   }
 
-  // ── idle / upload zone ─────────────────────────────────────────────────────
+  // -- idle / upload zone -----------------------------------------------------
   if (stage === 'idle') {
     return (
       <div style={{ minHeight: '100vh', background: '#0A1628', padding: '60px 24px' }}>
@@ -310,7 +310,7 @@ export function ResumeAnalyzerClient() {
     )
   }
 
-  // ── loading ────────────────────────────────────────────────────────────────
+  // -- loading ----------------------------------------------------------------
   if (stage === 'loading') {
     return (
       <div style={{ minHeight: '100vh', background: '#0A1628', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
@@ -331,7 +331,7 @@ export function ResumeAnalyzerClient() {
     )
   }
 
-  // ── results ────────────────────────────────────────────────────────────────
+  // -- results ----------------------------------------------------------------
   if (!result) return null
   const color = scoreColor(result.ats_score)
 
@@ -368,7 +368,7 @@ export function ResumeAnalyzerClient() {
           </button>
         </div>
 
-        {/* ── HERO SCORE ROW ── */}
+        {/* -- HERO SCORE ROW -- */}
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 24, marginBottom: 24, background: '#0F2044', border: '1px solid #1E3A5F', borderRadius: 20, padding: '28px 32px', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* gauge */}
           <div style={{ position: 'relative', width: 120, height: 120 }}>
@@ -411,7 +411,7 @@ export function ResumeAnalyzerClient() {
           </div>
         </div>
 
-        {/* ── TWO-COL LAYOUT ── */}
+        {/* -- TWO-COL LAYOUT -- */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start' }}>
 
           {/* LEFT COLUMN */}

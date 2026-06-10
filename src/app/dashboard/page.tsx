@@ -7,11 +7,11 @@ import Link from 'next/link'
 import {
   Search, Bookmark, PlusCircle, FileText,
   Crown, ChevronRight, MapPin, Briefcase,
-  Sparkles, Calendar, Mail, User,
+  Sparkles, Calendar, Mail, User, ArrowLeft,
 } from 'lucide-react'
 import Image from 'next/image'
 
-/* ── Explore cards ──────────────────────────────────────────────────────── */
+/* -- Explore cards -------------------------------------------------------- */
 const EXPLORE = [
   {
     href: '/search',
@@ -60,7 +60,7 @@ const EXPLORE = [
   },
 ]
 
-/* ── Helpers ─────────────────────────────────────────────────────────────── */
+/* -- Helpers --------------------------------------------------------------- */
 function formatDate(d: Date | null | undefined) {
   if (!d) return '—'
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -77,9 +77,9 @@ function Skeleton({ w, h, r = 8 }: { w: number | string; h: number; r?: number }
   )
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ===========================================================================
    DASHBOARD PAGE
-═══════════════════════════════════════════════════════════════════════════ */
+=========================================================================== */
 export default function DashboardPage() {
   const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
@@ -98,7 +98,7 @@ export default function DashboardPage() {
     <div style={{ background: '#0A1628', minHeight: '100vh', padding: '48px 24px 80px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-        {/* ── Back button ────────────────────────────────────────────── */}
+        {/* -- Back button ---------------------------------------------- */}
         <button
           onClick={() => router.back()}
           style={{
@@ -122,7 +122,7 @@ export default function DashboardPage() {
           <ArrowLeft size={15} /> Back
         </button>
 
-        {/* ── Page title ─────────────────────────────────────────────── */}
+        {/* -- Page title ----------------------------------------------- */}
         <div style={{ marginBottom: 36 }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -155,7 +155,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* ── Profile card ──────────────────────────────────────────── */}
+        {/* -- Profile card -------------------------------------------- */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(0,201,177,0.06) 0%, rgba(15,32,68,0.95) 60%)',
           border: '1px solid rgba(0,201,177,0.18)',
@@ -246,7 +246,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* ── Explore section ───────────────────────────────────────── */}
+        {/* -- Explore section ----------------------------------------- */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
             <div style={{

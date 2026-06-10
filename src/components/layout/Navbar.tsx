@@ -10,9 +10,9 @@ import {
 import { useSubscription } from '@/hooks/useSubscription'
 import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs'
 
-/* ══════════════════════════════════════════════════════
+/* ======================================================
    PLAN BADGE
-══════════════════════════════════════════════════════ */
+====================================================== */
 function PlanBadge() {
   const { data: sub } = useSubscription()
   const plan = sub?.plan_code ?? 'free'
@@ -45,9 +45,9 @@ function PlanBadge() {
   )
 }
 
-/* ══════════════════════════════════════════════════════
+/* ======================================================
    SIMPLE NAV LINK
-══════════════════════════════════════════════════════ */
+====================================================== */
 function NavLink({ href, icon: Icon, label, active }: {
   href: string; icon: React.ElementType; label: string; active: boolean
 }) {
@@ -66,9 +66,9 @@ function NavLink({ href, icon: Icon, label, active }: {
   )
 }
 
-/* ══════════════════════════════════════════════════════
+/* ======================================================
    EXPLORE DROPDOWN
-══════════════════════════════════════════════════════ */
+====================================================== */
 const EXPLORE_ITEMS = [
   { href: '/search',   icon: Search,     label: 'Search Jobs',  desc: 'Find jobs across 6 portals',      color: '#00C9B1' },
   { href: '/saved',    icon: Bookmark,   label: 'Saved Jobs',   desc: 'Your bookmarked listings',        color: '#38BDF8' },
@@ -115,7 +115,7 @@ function ExploreDropdown({ path }: { path: string }) {
   )
 }
 
-/* ── shared dropdown item ────────────────────────────────────────────────── */
+/* -- shared dropdown item -------------------------------------------------- */
 function DropItem({ href, icon: Icon, label, desc, color, active, onClick, divider }: {
   href: string; icon: React.ElementType; label: string; desc: string
   color: string; active: boolean; onClick: () => void; divider?: boolean
@@ -141,7 +141,7 @@ function DropItem({ href, icon: Icon, label, desc, color, active, onClick, divid
   )
 }
 
-/* ── shared panel style ──────────────────────────────────────────────────── */
+/* -- shared panel style ---------------------------------------------------- */
 function panelStyle(minW: number): React.CSSProperties {
   return {
     position: 'absolute', top: 'calc(100% + 10px)', right: 0,
@@ -153,9 +153,9 @@ function panelStyle(minW: number): React.CSSProperties {
   }
 }
 
-/* ══════════════════════════════════════════════════════
+/* ======================================================
    NAVBAR ROOT
-══════════════════════════════════════════════════════ */
+====================================================== */
 export function Navbar() {
   const path = usePathname()
 

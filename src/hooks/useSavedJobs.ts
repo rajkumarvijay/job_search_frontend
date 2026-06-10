@@ -4,10 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { savedApi } from '@/lib/api'
 import type { JobResult, SavedJob } from '@/types'
 
-// ─── Single shared query key ───────────────────────────────────────────────
+// --- Single shared query key -----------------------------------------------
 const QUERY_KEY = ['saved-jobs']
 
-// ─── useSavedJobs ─────────────────────────────────────────────────────────
+// --- useSavedJobs ---------------------------------------------------------
 // Safe to call in many components simultaneously:
 // - TanStack Query deduplicates the network request (only 1 API call)
 // - isSaved is computed from query data directly — NO Zustand store, NO useEffect

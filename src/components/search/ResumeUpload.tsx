@@ -9,7 +9,7 @@ import {
 import { resumeApi } from '@/lib/api'
 import type { ResumeResult, RecommendedJob } from '@/types'
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
+// --- helpers ------------------------------------------------------------------
 const scoreColor = (s: number) =>
   s >= 80 ? '#4ADE80' : s >= 65 ? '#00C9B1' : s >= 45 ? '#FBBF24' : s >= 30 ? '#FB923C' : '#F87171'
 
@@ -17,7 +17,7 @@ const impactColor: Record<string, string> = {
   High: '#F87171', Medium: '#FBBF24', Low: '#4ADE80',
 }
 
-// ─── sub-components ───────────────────────────────────────────────────────────
+// --- sub-components -----------------------------------------------------------
 function Tag({ text, color = '#00C9B1' }: { text: string; color?: string }) {
   return (
     <span style={{ padding: '3px 9px', borderRadius: 6, fontSize: 11, fontWeight: 600, background: `${color}18`, border: `1px solid ${color}35`, color }}>
@@ -78,7 +78,7 @@ function MiniJobCard({ job }: { job: RecommendedJob }) {
   )
 }
 
-// ─── main component ───────────────────────────────────────────────────────────
+// --- main component -----------------------------------------------------------
 export function ResumeUpload() {
   const [open,      setOpen]      = useState(false)
   const [loading,   setLoading]   = useState(false)
