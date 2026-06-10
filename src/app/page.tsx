@@ -4,7 +4,6 @@ import { LiveStats }        from '@/components/home/LiveStats'
 import { PainSolution }     from '@/components/home/PainSolution'
 import { FeaturesShowcase } from '@/components/home/FeaturesShowcase'
 import { TrendingRoles }    from '@/components/home/TrendingRoles'
-import { Testimonials }     from '@/components/home/Testimonials'
 import { ResumeSection }    from '@/components/home/ResumeSection'
 import { FinalCTA }         from '@/components/home/FinalCTA'
 
@@ -29,10 +28,7 @@ export default function HomePage() {
       {/* 6. Trending roles — horizontal scroll */}
       <TrendingRoles />
 
-      {/* 7. Testimonials — 6 user quotes */}
-      <Testimonials />
-
-      {/* 8. Resume scorer promo */}
+      {/* 7. Resume scorer promo */}
       <ResumeSection />
 
       {/* 9. Final CTA — conversion section */}
