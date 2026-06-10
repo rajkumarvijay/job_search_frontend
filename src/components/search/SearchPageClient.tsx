@@ -75,10 +75,10 @@ function SearchContent() {
       )}
 
       {/* Main layout */}
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div className="search-layout">
 
         {/* Filter sidebar */}
-        <aside style={{ width: 240, flexShrink: 0, minWidth: 200 }}>
+        <aside className="search-sidebar">
           <Suspense fallback={<FilterLoading />}>
             <FilterSidebar />
           </Suspense>

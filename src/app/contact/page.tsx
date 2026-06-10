@@ -202,7 +202,7 @@ export default function ContactPage() {
 
       {/* ===== FORM + FAQ GRID ===== */}
       <section style={{ padding: '0 24px 80px' }}>
-        <div style={{ maxWidth: 1060, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(360px,1fr))', gap: 28, alignItems: 'start' }}>
+        <div style={{ maxWidth: 1060, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,360px),1fr))', gap: 28, alignItems: 'start' }}>
 
           {/* Contact Form */}
           <div style={{ background: '#0F2044', border: '1px solid #1E3A5F', borderRadius: 24, padding: '36px' }}>
@@ -234,7 +234,7 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} noValidate>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,180px),1fr))', gap: 16 }}>
                     <div>
                       <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#8B9DC3', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Full Name *</label>
                       <input value={form.name} onChange={set('name')} required placeholder="Priya Sharma"

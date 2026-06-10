@@ -12,6 +12,12 @@ const inter = Inter({
   display: 'swap',
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
+
 export const metadata: Metadata = {
   title: 'JobQuest India — Every Great Career Starts with a Search',
   description:

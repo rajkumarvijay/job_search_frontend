@@ -197,7 +197,7 @@ function QuickStats({ savedCount, searchCount, appCount, interviewCount }: {
     { icon: Calendar,  label: 'Interviews',     value: interviewCount, color: '#FBBF24', href: '#interviews' },
   ]
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+    <div className="quick-stats-grid">
       {stats.map(({ icon: Icon, label, value, color, href }) => (
         <Link key={label} href={href} style={{ textDecoration: 'none' }}>
           <div style={{
@@ -285,8 +285,8 @@ function ApplicationTracker({ onCountChange }: { onCountChange: (n: number) => v
         }
       />
 
-      {/* Kanban columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, overflowX: 'auto' }}>
+      {/* Kanban columns — scrolls horizontally on mobile */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(140px, 1fr))', gap: 12, overflowX: 'auto', paddingBottom: 4 }}>
         {(Object.entries(STATUS_CFG) as [Application['status'], typeof STATUS_CFG[Application['status']]][]).map(([key, { label, color, icon: Icon }]) => (
           <div key={key} style={{ minWidth: 160 }}>
             {/* Column header */}
@@ -831,7 +831,7 @@ export default function DashboardPage() {
       <div style={{ background: '#0A1628', minHeight: '100vh', padding: '48px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
           <Skel w={240} h={40} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
+          <div className="quick-stats-grid">
             {[1,2,3,4].map(i => <Skel key={i} w="100%" h={100} r={20} />)}
           </div>
           <Skel w="100%" h={300} r={20} />
@@ -890,19 +890,19 @@ export default function DashboardPage() {
         <QuickStats savedCount={savedCount} searchCount={searchCount} appCount={appCount} interviewCount={interviewCount} />
 
         {/* Row 1: Profile Completion + Application Tracker */}
-        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 20, marginBottom: 20, alignItems: 'start' }}>
+        <div className="dash-row dash-row-1">
           <ProfileCompletion user={user} />
           <ApplicationTracker onCountChange={setAppCount} />
         </div>
 
         {/* Row 2: Recommended Jobs + Upcoming Interviews */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 20, marginBottom: 20, alignItems: 'start' }}>
+        <div className="dash-row dash-row-2">
           <RecommendedJobs />
           <UpcomingInterviews onCountChange={setInterviewCount} />
         </div>
 
         {/* Row 3: Recruiter Activity + Search Analytics */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+        <div className="dash-row dash-row-half">
           <RecruiterActivity savedCount={savedCount} searchCount={searchCount} />
           <SearchAnalytics />
         </div>

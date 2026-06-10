@@ -6,13 +6,13 @@ import { usePathname } from 'next/navigation'
 import {
   Briefcase, Search, Bookmark, Sparkles, Crown,
   FileText, Home, PlusCircle, ChevronDown, LayoutDashboard,
-  Info, Mail,
+  Info, Mail, Menu, X,
 } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs'
 
 /* ======================================================
-   PLAN BADGE
+   PLAN BADGE (unused in nav currently but kept for future use)
 ====================================================== */
 function PlanBadge() {
   const { data: sub } = useSubscription()
@@ -47,13 +47,13 @@ function PlanBadge() {
 }
 
 /* ======================================================
-   SIMPLE NAV LINK
+   SIMPLE NAV LINK — used in both desktop bar and mobile drawer
 ====================================================== */
-function NavLink({ href, icon: Icon, label, active }: {
-  href: string; icon: React.ElementType; label: string; active: boolean
+function NavLink({ href, icon: Icon, label, active, onClick }: {
+  href: string; icon: React.ElementType; label: string; active: boolean; onClick?: () => void
 }) {
   return (
-    <Link href={href} style={{
+    <Link href={href} onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 6,
       padding: '8px 14px', borderRadius: 10,
       fontSize: 14, fontWeight: 500, textDecoration: 'none',
@@ -68,7 +68,7 @@ function NavLink({ href, icon: Icon, label, active }: {
 }
 
 /* ======================================================
-   EXPLORE DROPDOWN
+   EXPLORE DROPDOWN (desktop only, kept for future re-use)
 ====================================================== */
 const EXPLORE_ITEMS = [
   { href: '/search',   icon: Search,     label: 'Search Jobs',  desc: 'Find jobs across 6 portals',      color: '#00C9B1' },
@@ -116,7 +116,6 @@ function ExploreDropdown({ path }: { path: string }) {
   )
 }
 
-/* -- shared dropdown item -------------------------------------------------- */
 function DropItem({ href, icon: Icon, label, desc, color, active, onClick, divider }: {
   href: string; icon: React.ElementType; label: string; desc: string
   color: string; active: boolean; onClick: () => void; divider?: boolean
@@ -142,7 +141,6 @@ function DropItem({ href, icon: Icon, label, desc, color, active, onClick, divid
   )
 }
 
-/* -- shared panel style ---------------------------------------------------- */
 function panelStyle(minW: number): React.CSSProperties {
   return {
     position: 'absolute', top: 'calc(100% + 10px)', right: 0,
@@ -155,86 +153,167 @@ function panelStyle(minW: number): React.CSSProperties {
 }
 
 /* ======================================================
-   NAVBAR ROOT
+   MOBILE DRAWER
 ====================================================== */
-export function Navbar() {
-  const path = usePathname()
+const MOBILE_NAV_LINKS = [
+  { href: '/',          icon: Home,            label: 'Home'      },
+  { href: '/about',     icon: Info,            label: 'About'     },
+  { href: '/contact',   icon: Mail,            label: 'Contact'   },
+  { href: '/search',    icon: Search,          label: 'Search Jobs' },
+  { href: '/saved',     icon: Bookmark,        label: 'Saved Jobs'  },
+  { href: '/post-job',  icon: PlusCircle,      label: 'Post a Job'  },
+  { href: '/resume',    icon: FileText,        label: 'Resume Score'},
+]
 
+function MobileDrawer({ path, onClose }: { path: string; onClose: () => void }) {
   return (
-    <nav style={{
-      position: 'sticky', top: 0, zIndex: 50,
-      background: 'rgba(10,22,40,0.85)',
-      backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-      borderBottom: '1px solid #1E3A5F',
-    }}>
-      <div style={{
-        maxWidth: 1280, margin: '0 auto', padding: '0 24px', height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: 10, background: '#00C9B1',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 14px rgba(0,201,177,0.4)',
-          }}>
-            <Briefcase size={17} color="#0A1628" strokeWidth={2.5} />
-          </div>
-          <span style={{ fontWeight: 800, fontSize: 20, color: '#F0F4FF', letterSpacing: '-0.02em' }}>
-            Job<span style={{ color: '#00C9B1' }}>Quest</span>
-          </span>
-        </Link>
+    <div className="nav-drawer">
+      {MOBILE_NAV_LINKS.map(({ href, icon, label }) => (
+        <NavLink key={href} href={href} icon={icon} label={label} active={path === href} onClick={onClose} />
+      ))}
 
-        {/* Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <NavLink href="/" icon={Home} label="Home" active={path === '/'} />
-          <NavLink href="/about" icon={Info} label="About" active={path === '/about'} />
-          <NavLink href="/contact" icon={Mail} label="Contact" active={path === '/contact'} />
-
-          {/* Clerk auth controls */}
-          <Show when="signed-out">
+      <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #1E3A5F' }}>
+        <Show when="signed-out">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <SignInButton mode="modal">
-              <button style={{
-                padding: '7px 16px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+              <button onClick={onClose} style={{
+                width: '100%', padding: '12px 16px', borderRadius: 10, fontSize: 15, fontWeight: 600,
                 cursor: 'pointer', border: '1px solid #1E3A5F',
-                background: 'transparent', color: '#8B9DC3', transition: 'all 0.18s',
-              }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#F0F4FF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#4A6FA5' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#8B9DC3'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#1E3A5F' }}
-              >
+                background: 'transparent', color: '#8B9DC3',
+              }}>
                 Sign In
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button style={{
-                padding: '7px 16px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+              <button onClick={onClose} style={{
+                width: '100%', padding: '12px 16px', borderRadius: 10, fontSize: 15, fontWeight: 600,
                 cursor: 'pointer', border: '1px solid rgba(0,201,177,0.4)',
-                background: 'rgba(0,201,177,0.1)', color: '#00C9B1', transition: 'all 0.18s',
-              }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,201,177,0.18)' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,201,177,0.1)' }}
-              >
+                background: 'rgba(0,201,177,0.1)', color: '#00C9B1',
+              }}>
                 Sign Up
               </button>
             </SignUpButton>
-          </Show>
-          <Show when="signed-in">
-            <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={path === '/dashboard'} />
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: { width: 34, height: 34 },
-                },
-              }}
-            />
-          </Show>
-        </div>
+          </div>
+        </Show>
+        <Show when="signed-in">
+          <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={path === '/dashboard'} onClick={onClose} />
+        </Show>
       </div>
+    </div>
+  )
+}
 
-      <style>{`
-        @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes spin    { to { transform: rotate(360deg); } }
-      `}</style>
-    </nav>
+/* ======================================================
+   NAVBAR ROOT
+====================================================== */
+export function Navbar() {
+  const path = usePathname()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Close drawer on route change
+  useEffect(() => { setMenuOpen(false) }, [path])
+
+  // Prevent body scroll when drawer is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  return (
+    <>
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        background: 'rgba(10,22,40,0.92)',
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #1E3A5F',
+      }}>
+        <div style={{
+          maxWidth: 1280, margin: '0 auto', padding: '0 20px', height: 64,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          {/* Logo */}
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 10, background: '#00C9B1',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 14px rgba(0,201,177,0.4)',
+            }}>
+              <Briefcase size={17} color="#0A1628" strokeWidth={2.5} />
+            </div>
+            <span style={{ fontWeight: 800, fontSize: 20, color: '#F0F4FF', letterSpacing: '-0.02em' }}>
+              Job<span style={{ color: '#00C9B1' }}>Quest</span>
+            </span>
+          </Link>
+
+          {/* Desktop nav links */}
+          <div className="nav-links-desktop">
+            <NavLink href="/"        icon={Home}            label="Home"    active={path === '/'}        />
+            <NavLink href="/about"   icon={Info}            label="About"   active={path === '/about'}   />
+            <NavLink href="/contact" icon={Mail}            label="Contact" active={path === '/contact'} />
+
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button style={{
+                  padding: '7px 16px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                  cursor: 'pointer', border: '1px solid #1E3A5F',
+                  background: 'transparent', color: '#8B9DC3', transition: 'all 0.18s',
+                  marginLeft: 4,
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#F0F4FF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#4A6FA5' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#8B9DC3'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#1E3A5F' }}
+                >
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button style={{
+                  padding: '7px 16px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                  cursor: 'pointer', border: '1px solid rgba(0,201,177,0.4)',
+                  background: 'rgba(0,201,177,0.1)', color: '#00C9B1', transition: 'all 0.18s',
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,201,177,0.18)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,201,177,0.1)' }}
+                >
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </Show>
+
+            <Show when="signed-in">
+              <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={path === '/dashboard'} />
+              <UserButton appearance={{ elements: { avatarBox: { width: 34, height: 34 } } }} />
+            </Show>
+          </div>
+
+          {/* Mobile right side: UserButton + hamburger */}
+          <div className="nav-hamburger" style={{ alignItems: 'center', gap: 10 }}>
+            <Show when="signed-in">
+              <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+            </Show>
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 40, height: 40, borderRadius: 10,
+                background: menuOpen ? 'rgba(0,201,177,0.1)' : 'transparent',
+                border: `1px solid ${menuOpen ? 'rgba(0,201,177,0.3)' : '#1E3A5F'}`,
+                color: menuOpen ? '#00C9B1' : '#8B9DC3',
+                cursor: 'pointer', transition: 'all 0.18s',
+              }}
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+        `}</style>
+      </nav>
+
+      {/* Mobile drawer — rendered outside nav so it doesn't inherit sticky positioning */}
+      {menuOpen && <MobileDrawer path={path} onClose={() => setMenuOpen(false)} />}
+    </>
   )
 }
