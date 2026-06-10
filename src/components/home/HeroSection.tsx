@@ -1,6 +1,7 @@
 'use client'
 
-import { Zap, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
+import { Zap, TrendingUp, Search, FileText } from 'lucide-react'
 
 const TRENDING_ROW_1 = [
   'Software Engineer', 'Data Scientist', 'Product Manager', 'DevOps Engineer',
@@ -107,11 +108,40 @@ export function HeroSection() {
         {/* Subtext */}
         <p style={{
           fontSize: 18, color: '#8B9DC3',
-          maxWidth: 520, margin: '0 auto 52px',
+          maxWidth: 520, margin: '0 auto 40px',
           lineHeight: 1.6,
         }}>
           Search once. Get results from LinkedIn, Indeed, Glassdoor, Naukri, ZipRecruiter and Google Jobs — unified in one beautiful portal.
         </p>
+
+        {/* CTA buttons */}
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 52 }}>
+          <Link href="/search" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 9,
+            padding: '16px 32px', borderRadius: 14, textDecoration: 'none',
+            background: '#00C9B1', color: '#0A1628',
+            fontSize: 16, fontWeight: 800,
+            boxShadow: '0 0 28px rgba(0,201,177,0.35)',
+            transition: 'all 0.2s',
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#00B09D'; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#00C9B1'; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)' }}
+          >
+            <Search size={18} /> Search Jobs — It&apos;s Free
+          </Link>
+          <Link href="/resume" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 9,
+            padding: '16px 32px', borderRadius: 14, textDecoration: 'none',
+            background: 'transparent', color: '#F0F4FF',
+            border: '1.5px solid #1E3A5F', fontSize: 16, fontWeight: 700,
+            transition: 'all 0.2s',
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#4A6FA5'; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#1E3A5F'; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)' }}
+          >
+            <FileText size={17} /> Score My Resume
+          </Link>
+        </div>
 
       </div>
 

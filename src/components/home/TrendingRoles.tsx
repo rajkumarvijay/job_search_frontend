@@ -91,8 +91,20 @@ function RoleCard({ role, idx }: { role: TrendingRole; idx: number }) {
   )
 }
 
+const FALLBACK_ROLES: TrendingRole[] = [
+  { role: 'Software Engineer',    count: 48200, icon: 'code',        top_skill: 'React',      avg_salary_lpa: '18' },
+  { role: 'Data Scientist',       count: 21000, icon: 'bar-chart',   top_skill: 'Python',     avg_salary_lpa: '22' },
+  { role: 'DevOps Engineer',      count: 18500, icon: 'server',      top_skill: 'Kubernetes', avg_salary_lpa: '20' },
+  { role: 'Product Manager',      count: 15300, icon: 'trending-up', top_skill: 'Agile',      avg_salary_lpa: '24' },
+  { role: 'Full Stack Developer', count: 38000, icon: 'layers',      top_skill: 'Node.js',    avg_salary_lpa: '16' },
+  { role: 'Cloud Architect',      count: 12000, icon: 'cloud',       top_skill: 'AWS',        avg_salary_lpa: '28' },
+  { role: 'UI/UX Designer',       count: 14700, icon: 'pen-tool',    top_skill: 'Figma',      avg_salary_lpa: '14' },
+  { role: 'ML Engineer',          count: 16400, icon: 'cpu',         top_skill: 'TensorFlow', avg_salary_lpa: '25' },
+]
+
 export function TrendingRoles() {
   const { data: roles, isLoading } = useTrendingRoles()
+  const displayRoles = (!isLoading && (!roles || roles.length === 0)) ? FALLBACK_ROLES : (roles ?? [])
 
   return (
     <section style={{ padding: '80px 0' }}>
@@ -112,7 +124,7 @@ export function TrendingRoles() {
                   animation: 'pulse 2s ease-in-out infinite',
                 }} />
               ))
-            : (roles ?? []).map((role, i) => <RoleCard key={role.role} role={role} idx={i} />)
+            : displayRoles.map((role, i) => <RoleCard key={role.role} role={role} idx={i} />)
           }
         </div>
       </div>
