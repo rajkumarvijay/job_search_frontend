@@ -1,31 +1,18 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Search, MapPin, Zap } from 'lucide-react'
-import { POPULAR_KEYWORDS, INDIA_CITIES } from '@/lib/constants'
+import { Zap } from 'lucide-react'
 
 export function HeroSection() {
-  const router = useRouter()
-  const [query, setQuery] = useState('')
-  const [location, setLocation] = useState('India')
-  const [focused, setFocused] = useState(false)
-
-  const handleSearch = useCallback(() => {
-    if (!query.trim()) return
-    router.push(`/search?q=${encodeURIComponent(query.trim())}&location=${encodeURIComponent(location)}`)
-  }, [query, location, router])
-
   return (
     <section
       style={{
         position: 'relative',
-        minHeight: '90vh',
+        minHeight: '70vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 24px 80px',
+        padding: '80px 24px 80px',
         overflow: 'hidden',
         background: '#0A1628',
       }}
@@ -66,7 +53,7 @@ export function HeroSection() {
           lineHeight: 1.08,
           letterSpacing: '-0.03em',
           color: '#F0F4FF',
-          marginBottom: 16,
+          marginBottom: 24,
         }}>
           Every Great Career
           <br />
@@ -77,185 +64,11 @@ export function HeroSection() {
           fontSize: 18,
           color: '#8B9DC3',
           maxWidth: 520,
-          margin: '0 auto 44px',
+          margin: '0 auto',
           lineHeight: 1.6,
         }}>
           Search once. Get results from LinkedIn, Indeed, Glassdoor, Naukri, ZipRecruiter and Google Jobs — unified in one beautiful portal.
         </p>
-
-        {/* Search bar */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 0,
-          background: '#0F2044',
-          border: `1.5px solid ${focused ? '#00C9B1' : '#1E3A5F'}`,
-          borderRadius: 18,
-          boxShadow: focused ? '0 0 0 4px rgba(0,201,177,0.12)' : '0 4px 32px rgba(0,0,0,0.3)',
-          transition: 'all 0.25s',
-          overflow: 'hidden',
-          maxWidth: 780,
-          margin: '0 auto',
-        }}>
-          {/* Query input */}
-          <div style={{
-            flex: '1 1 260px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '0 20px',
-            borderRight: '1px solid #1E3A5F',
-            minHeight: 64,
-          }}>
-            <Search size={18} color="#00C9B1" />
-            <input
-              type="text"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              placeholder="Job title, skills or keywords..."
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                color: '#F0F4FF',
-                fontSize: 16,
-              }}
-            />
-          </div>
-          {/* Location */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '0 18px',
-            borderRight: '1px solid #1E3A5F',
-            minHeight: 64,
-            minWidth: 160,
-          }}>
-            <MapPin size={15} color="#8B9DC3" />
-            <select
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                color: '#F0F4FF',
-                fontSize: 14,
-                cursor: 'pointer',
-              }}
-            >
-              {INDIA_CITIES.map(c => (
-                <option key={c} value={c} style={{ background: '#0F2044' }}>{c}</option>
-              ))}
-            </select>
-          </div>
-          {/* Search button */}
-          <div style={{ display: 'flex', alignItems: 'center', margin: 8, flexShrink: 0 }}>
-            <button
-              onClick={handleSearch}
-              className="jq-btn"
-              style={{ borderRadius: 12, fontSize: 15, padding: '0 22px', minHeight: 48 }}
-            >
-              <Search size={16} />
-              Search Jobs
-            </button>
-          </div>
-        </div>
-
-        {/* Quick keywords */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: 8,
-          marginTop: 28,
-        }}>
-          <span style={{ fontSize: 13, color: '#8B9DC3', alignSelf: 'center', marginRight: 4 }}>Popular:</span>
-          {POPULAR_KEYWORDS.slice(0, 7).map(kw => (
-            <button
-              key={kw}
-              onClick={() => router.push(`/search?q=${encodeURIComponent(kw)}&location=India`)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 999,
-                fontSize: 13,
-                fontWeight: 500,
-                border: '1px solid #1E3A5F',
-                background: 'rgba(255,255,255,0.03)',
-                color: '#8B9DC3',
-                cursor: 'pointer',
-                transition: 'all 0.18s',
-              }}
-              onMouseEnter={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#00C9B1'
-                ;(e.currentTarget as HTMLButtonElement).style.color = '#00C9B1'
-              }}
-              onMouseLeave={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#1E3A5F'
-                ;(e.currentTarget as HTMLButtonElement).style.color = '#8B9DC3'
-              }}
-            >
-              {kw}
-            </button>
-          ))}
-        </div>
-
-        {/* Social proof row */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 16,
-          marginTop: 40,
-          flexWrap: 'wrap',
-        }}>
-          {/* Avatar stack */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {['#00C9B1','#38BDF8','#A78BFA','#FBBF24','#F472B6'].map((c, i) => (
-              <div key={c} style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: `linear-gradient(135deg, ${c}cc, ${c}55)`,
-                border: '2px solid #0A1628',
-                marginLeft: i === 0 ? 0 : -10,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 800, color: '#0A1628',
-                zIndex: 5 - i,
-                position: 'relative',
-              }}>
-                {['R','S','A','P','M'][i]}
-              </div>
-            ))}
-          </div>
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ display: 'flex', gap: 2, marginBottom: 2 }}>
-              {[1,2,3,4,5].map(s => (
-                <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-              ))}
-            </div>
-            <div style={{ fontSize: 13, color: '#8B9DC3' }}>
-              <strong style={{ color: '#F0F4FF' }}>50,000+</strong> job seekers trust JobQuest
-            </div>
-          </div>
-          <div style={{
-            width: 1, height: 32, background: '#1E3A5F',
-            display: 'none',
-          }} className="hero-divider" />
-          <div style={{
-            padding: '6px 16px', borderRadius: 999,
-            background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.25)',
-            fontSize: 13, color: '#4ADE80', fontWeight: 600,
-          }}>
-            ✦ 100% Free to use
-          </div>
-        </div>
-
       </div>
 
     </section>
