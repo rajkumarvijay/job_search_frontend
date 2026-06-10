@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   Briefcase, Search, Bookmark, Sparkles, Crown,
   FileText, Home, PlusCircle, ChevronDown, LayoutDashboard,
+  Info, Mail,
 } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs'
@@ -187,6 +188,8 @@ export function Navbar() {
         {/* Right */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <NavLink href="/" icon={Home} label="Home" active={path === '/'} />
+          <NavLink href="/about" icon={Info} label="About" active={path === '/about'} />
+          <NavLink href="/contact" icon={Mail} label="Contact" active={path === '/contact'} />
 
           {/* Clerk auth controls */}
           <Show when="signed-out">

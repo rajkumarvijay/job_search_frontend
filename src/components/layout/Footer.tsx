@@ -35,18 +35,6 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 style={{ fontSize: 12, fontWeight: 700, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Company</h4>
-            {[['/about', 'About Us'], ['/contact', 'Contact Us']].map(([href, label]) => (
-              <Link key={href} href={href} style={{ display: 'block', fontSize: 14, color: '#8B9DC3', textDecoration: 'none', marginBottom: 10, transition: 'color 0.15s' }}
-                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = '#00C9B1'}
-                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = '#8B9DC3'}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          <div>
             <h4 style={{ fontSize: 12, fontWeight: 700, color: '#F0F4FF', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Portals</h4>
             {['LinkedIn', 'Indeed', 'Glassdoor', 'Naukri', 'ZipRecruiter', 'Google Jobs'].map(p => (
               <div key={p} style={{ fontSize: 14, color: '#8B9DC3', marginBottom: 8 }}>{p}</div>
