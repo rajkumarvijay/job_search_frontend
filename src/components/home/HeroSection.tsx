@@ -3,53 +3,6 @@
 import Link from 'next/link'
 import { Zap, Search, FileText } from 'lucide-react'
 
-const TRENDING_ROW_1 = [
-  'Software Engineer', 'Data Scientist', 'Product Manager', 'DevOps Engineer',
-  'React Developer', 'Machine Learning', 'UI/UX Designer', 'Full Stack Developer',
-  'Cloud Architect', 'Cybersecurity Analyst', 'Business Analyst', 'Scrum Master',
-  'Android Developer', 'iOS Developer', 'Node.js Developer', 'Python Developer',
-]
-
-const TRENDING_ROW_2 = [
-  'Digital Marketing', 'Data Engineer', 'Java Developer', 'Salesforce Admin',
-  'HR Manager', 'Finance Analyst', 'Content Writer', 'QA Engineer',
-  'Solution Architect', 'Blockchain Developer', 'AI/ML Engineer', 'SAP Consultant',
-  'Technical Writer', 'Operations Manager', 'Growth Hacker', 'SEO Specialist',
-]
-
-const COLORS = ['#00C9B1', '#38BDF8', '#A78BFA', '#FBBF24', '#4ADE80', '#F472B6', '#FB923C', '#67E8F9']
-
-function TrendingMarquee({ items, reverse = false }: { items: string[]; reverse?: boolean }) {
-  const doubled = [...items, ...items]
-  return (
-    <div style={{ overflow: 'hidden', width: '100%' }}>
-      <div style={{
-        display: 'flex',
-        gap: 10,
-        width: 'max-content',
-        animation: `marquee ${reverse ? '28s' : '22s'} linear infinite ${reverse ? 'reverse' : ''}`,
-      }}>
-        {doubled.map((item, i) => (
-          <span key={i} style={{
-            flexShrink: 0,
-            padding: '7px 16px',
-            borderRadius: 999,
-            fontSize: 13,
-            fontWeight: 600,
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid #1E3A5F',
-            color: COLORS[i % COLORS.length],
-            whiteSpace: 'nowrap',
-            letterSpacing: '0.01em',
-          }}>
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export function HeroSection() {
   return (
     <section
@@ -60,7 +13,7 @@ export function HeroSection() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '80px 0 80px',
+        padding: '80px 0',
         overflow: 'hidden',
         background: '#0A1628',
       }}
@@ -115,7 +68,7 @@ export function HeroSection() {
         </p>
 
         {/* CTA buttons */}
-        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 52 }}>
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/search" style={{
             display: 'inline-flex', alignItems: 'center', gap: 9,
             padding: '16px 32px', borderRadius: 14, textDecoration: 'none',
@@ -143,15 +96,6 @@ export function HeroSection() {
           </Link>
         </div>
 
-      </div>
-
-      {/* Trending keywords — full width marquees */}
-      <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <TrendingMarquee items={TRENDING_ROW_1} />
-          <TrendingMarquee items={TRENDING_ROW_2} reverse />
-        </div>
       </div>
 
     </section>
