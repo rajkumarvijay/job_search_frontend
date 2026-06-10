@@ -204,6 +204,58 @@ export function HeroSection() {
             </button>
           ))}
         </div>
+
+        {/* Social proof row */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 16,
+          marginTop: 40,
+          flexWrap: 'wrap',
+        }}>
+          {/* Avatar stack */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {['#00C9B1','#38BDF8','#A78BFA','#FBBF24','#F472B6'].map((c, i) => (
+              <div key={c} style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: `linear-gradient(135deg, ${c}cc, ${c}55)`,
+                border: '2px solid #0A1628',
+                marginLeft: i === 0 ? 0 : -10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, fontWeight: 800, color: '#0A1628',
+                zIndex: 5 - i,
+                position: 'relative',
+              }}>
+                {['R','S','A','P','M'][i]}
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ display: 'flex', gap: 2, marginBottom: 2 }}>
+              {[1,2,3,4,5].map(s => (
+                <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              ))}
+            </div>
+            <div style={{ fontSize: 13, color: '#8B9DC3' }}>
+              <strong style={{ color: '#F0F4FF' }}>50,000+</strong> job seekers trust JobQuest
+            </div>
+          </div>
+          <div style={{
+            width: 1, height: 32, background: '#1E3A5F',
+            display: 'none',
+          }} className="hero-divider" />
+          <div style={{
+            padding: '6px 16px', borderRadius: 999,
+            background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.25)',
+            fontSize: 13, color: '#4ADE80', fontWeight: 600,
+          }}>
+            ✦ 100% Free to use
+          </div>
+        </div>
+
       </div>
 
     </section>
