@@ -227,12 +227,15 @@ export function ResumeUpload() {
                   {result.quick_wins?.length > 0 && (
                     <Accordion label="⚡ Quick Wins" id="quick_wins" expanded={expanded} onToggle={toggle} badge={result.quick_wins.length}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {result.quick_wins.map((w, i) => (
-                          <div key={i} style={{ display: 'flex', gap: 10, padding: '9px 12px', borderRadius: 8, background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.18)' }}>
-                            <span style={{ fontSize: 12, fontWeight: 800, color: '#FBBF24', flexShrink: 0 }}>{i + 1}</span>
-                            <span style={{ fontSize: 13, color: '#F0F4FF', lineHeight: 1.5 }}>{w}</span>
-                          </div>
-                        ))}
+                        {result.quick_wins.map((w, i) => {
+                          const text = typeof w === 'object' && w !== null ? (w as { action: string }).action : String(w)
+                          return (
+                            <div key={i} style={{ display: 'flex', gap: 10, padding: '9px 12px', borderRadius: 8, background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.18)' }}>
+                              <span style={{ fontSize: 12, fontWeight: 800, color: '#FBBF24', flexShrink: 0 }}>{i + 1}</span>
+                              <span style={{ fontSize: 13, color: '#F0F4FF', lineHeight: 1.5 }}>{text}</span>
+                            </div>
+                          )
+                        })}
                       </div>
                     </Accordion>
                   )}
@@ -281,11 +284,14 @@ export function ResumeUpload() {
                   {result.strengths?.length > 0 && (
                     <Accordion label="✅ Strengths" id="strengths" expanded={expanded} onToggle={toggle} badge={result.strengths.length}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {result.strengths.map((s, i) => (
-                          <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4ADE80', lineHeight: 1.5 }}>
-                            <CheckCircle size={13} style={{ flexShrink: 0, marginTop: 2 }} />{s}
-                          </div>
-                        ))}
+                        {result.strengths.map((s, i) => {
+                          const text = typeof s === 'object' && s !== null ? (s as { title: string }).title : String(s)
+                          return (
+                            <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4ADE80', lineHeight: 1.5 }}>
+                              <CheckCircle size={13} style={{ flexShrink: 0, marginTop: 2 }} />{text}
+                            </div>
+                          )
+                        })}
                       </div>
                     </Accordion>
                   )}

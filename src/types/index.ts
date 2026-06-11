@@ -142,6 +142,53 @@ export interface RecommendedJob {
   match_reason: string
 }
 
+export interface QuickWin {
+  action: string
+  time_required: string
+  score_impact: string
+}
+
+export interface Strength {
+  title: string
+  explanation: string
+}
+
+export interface ExperienceEntry {
+  company: string
+  title: string
+  duration: string
+  is_quantified: boolean
+  key_achievements: string[]
+  impact_score: number
+}
+
+export interface Project {
+  name: string
+  tech_stack: string[]
+  description: string
+  has_metrics: boolean
+  github_mentioned: boolean
+}
+
+export interface EducationEntry {
+  degree: string
+  institution: string
+  year: string
+  gpa_cgpa: string | null
+}
+
+export interface ExtractedSkills {
+  technical: string[]
+  soft: string[]
+  tools: string[]
+  certifications: string[]
+}
+
+export interface KeywordDensity {
+  present: string[]
+  overused: string[]
+}
+
 export interface ResumeResult {
   ats_score: number
   grade: string
@@ -151,12 +198,19 @@ export interface ResumeResult {
   section_scores: SectionScores
   top_skills: string[]
   recommended_roles: string[]
-  strengths: string[]
+  strengths: Strength[] | string[]
   improvements: Improvement[]
   missing_keywords: string[]
   recommended_keywords: string[]
   format_issues: string[]
-  quick_wins: string[]
+  quick_wins: QuickWin[] | string[]
+  // enriched fields
+  extracted_skills?: ExtractedSkills
+  experience_breakdown?: ExperienceEntry[]
+  projects?: Project[]
+  education?: EducationEntry[]
+  keyword_density?: KeywordDensity
+  indian_job_market_tips?: string[]
   recommended_jobs?: RecommendedJob[]
   error?: string
 }

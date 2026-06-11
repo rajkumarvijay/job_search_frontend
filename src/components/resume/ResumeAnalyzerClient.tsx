@@ -2,13 +2,17 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import {
-  Upload, FileText, X, CheckCircle, AlertTriangle, Loader2,
+  Upload, CheckCircle, AlertTriangle,
   ChevronDown, ChevronUp, Zap, Star, TrendingUp, Target,
   ExternalLink, Briefcase, MapPin, IndianRupee, ArrowRight,
-  Shield, Clock, BarChart3, Lightbulb,
+  Shield, BarChart3, Lightbulb, Code2, FolderGit2, GraduationCap,
+  Globe, CheckCircle2,
 } from 'lucide-react'
 import { resumeApi } from '@/lib/api'
-import type { ResumeResult, Improvement, RecommendedJob } from '@/types'
+import type {
+  ResumeResult, Improvement, RecommendedJob,
+  QuickWin, Strength, ExperienceEntry, Project,
+} from '@/types'
 
 // --- colour helpers -----------------------------------------------------------
 const scoreColor = (s: number) =>
@@ -175,7 +179,9 @@ export function ResumeAnalyzerClient() {
     if (stage !== 'loading') return
     const msgs = [
       'Extracting resume content…',
+      'Parsing skills & experience…',
       'Scanning for ATS keywords…',
+      'Analysing projects & achievements…',
       'Scoring section quality…',
       'Identifying skill gaps…',
       'Generating job recommendations…',
@@ -291,10 +297,12 @@ export function ResumeAnalyzerClient() {
           {/* feature pills */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12, marginTop: 32 }}>
             {[
-              { icon: Shield,   label: 'ATS Score',           desc: 'Instant 0–100 rating',          color: '#00C9B1' },
-              { icon: BarChart3, label: 'Section Scores',     desc: '6-category breakdown',           color: '#A78BFA' },
-              { icon: Lightbulb, label: 'Smart Fixes',        desc: 'Ranked improvement tips',        color: '#FBBF24' },
-              { icon: Target,   label: 'Job Matches',         desc: 'AI curated opportunities',       color: '#4ADE80' },
+              { icon: Shield,      label: 'ATS Score',          desc: 'Instant 0–100 rating',           color: '#00C9B1' },
+              { icon: BarChart3,   label: 'Section Scores',     desc: '6-category breakdown',            color: '#A78BFA' },
+              { icon: Code2,       label: 'Skills Extraction',  desc: 'Tech, tools & soft skills',       color: '#38BDF8' },
+              { icon: FolderGit2,  label: 'Projects Analysis',  desc: 'Tech stack & impact review',      color: '#F472B6' },
+              { icon: Lightbulb,   label: 'Smart Fixes',        desc: 'Ranked improvement tips',         color: '#FBBF24' },
+              { icon: Target,      label: 'Job Matches',        desc: 'AI curated opportunities',        color: '#4ADE80' },
             ].map(({ icon: Icon, label, desc, color }) => (
               <div key={label} style={{ padding: '14px 16px', borderRadius: 12, background: 'rgba(15,32,68,0.6)', border: '1px solid #1E3A5F' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -452,12 +460,24 @@ export function ResumeAnalyzerClient() {
             {result.quick_wins?.length > 0 && (
               <Accordion label="⚡ Quick Wins" id="quick_wins" expanded={expanded} onToggle={toggle} badge={result.quick_wins.length}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {result.quick_wins.map((w, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: '#FBBF24', flexShrink: 0 }}>{i + 1}</span>
-                      <span style={{ fontSize: 13, color: '#F0F4FF', lineHeight: 1.5 }}>{w}</span>
-                    </div>
-                  ))}
+                  {result.quick_wins.map((w, i) => {
+                    const isObj = typeof w === 'object' && w !== null
+                    const qw = isObj ? w as QuickWin : null
+                    return (
+                      <div key={i} style={{ padding: '12px 14px', borderRadius: 8, background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#FBBF24', flexShrink: 0 }}>{i + 1}</span>
+                          <span style={{ fontSize: 13, color: '#F0F4FF', lineHeight: 1.5 }}>{qw ? qw.action : String(w)}</span>
+                        </div>
+                        {qw && (
+                          <div style={{ display: 'flex', gap: 10, marginTop: 6, paddingLeft: 22 }}>
+                            <span style={{ fontSize: 11, color: '#8B9DC3' }}>⏱ {qw.time_required}</span>
+                            <span style={{ fontSize: 11, color: '#4ADE80', fontWeight: 700 }}>{qw.score_impact}</span>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </Accordion>
             )}
@@ -485,12 +505,26 @@ export function ResumeAnalyzerClient() {
             {/* Strengths */}
             {result.strengths?.length > 0 && (
               <Accordion label="✅ Strengths" id="strengths" expanded={expanded} onToggle={toggle} badge={result.strengths.length}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {result.strengths.map((s, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4ADE80', lineHeight: 1.5 }}>
-                      <CheckCircle size={14} style={{ flexShrink: 0, marginTop: 2 }} />{s}
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {result.strengths.map((s, i) => {
+                    const isObj = typeof s === 'object' && s !== null
+                    const st = isObj ? s as Strength : null
+                    return (
+                      <div key={i} style={{ display: 'flex', gap: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.15)' }}>
+                        <CheckCircle size={14} color="#4ADE80" style={{ flexShrink: 0, marginTop: 2 }} />
+                        <div>
+                          {st ? (
+                            <>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: '#4ADE80', marginBottom: 2 }}>{st.title}</div>
+                              <div style={{ fontSize: 12, color: '#A8C0E0', lineHeight: 1.5 }}>{st.explanation}</div>
+                            </>
+                          ) : (
+                            <span style={{ fontSize: 13, color: '#4ADE80', lineHeight: 1.5 }}>{String(s)}</span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </Accordion>
             )}
@@ -503,6 +537,87 @@ export function ResumeAnalyzerClient() {
                     <li key={i} style={{ fontSize: 13, color: '#FB923C', lineHeight: 1.5 }}>{f}</li>
                   ))}
                 </ul>
+              </Accordion>
+            )}
+
+            {/* Experience Breakdown */}
+            {result.experience_breakdown && result.experience_breakdown.length > 0 && (
+              <Accordion label="💼 Experience Breakdown" id="experience" expanded={expanded} onToggle={toggle} badge={result.experience_breakdown.length}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {(result.experience_breakdown as ExperienceEntry[]).map((exp, i) => (
+                    <div key={i} style={{ padding: '14px 16px', borderRadius: 10, background: 'rgba(56,189,248,0.04)', border: '1px solid rgba(56,189,248,0.15)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: '#F0F4FF' }}>{exp.title}</div>
+                          <div style={{ fontSize: 12, color: '#38BDF8', marginTop: 2 }}>{exp.company} · {exp.duration}</div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            {[1,2,3,4,5,6,7,8,9,10].slice(0,10).map(n => (
+                              <div key={n} style={{ width: 6, height: 6, borderRadius: 2, background: n <= (exp.impact_score || 0) ? '#38BDF8' : '#1E3A5F' }} />
+                            ))}
+                          </div>
+                          <span style={{ fontSize: 10, color: '#8B9DC3' }}>Impact {exp.impact_score}/10</span>
+                        </div>
+                      </div>
+                      {!exp.is_quantified && (
+                        <div style={{ fontSize: 11, color: '#FBBF24', marginBottom: 6 }}>⚠ No quantified achievements — add numbers to boost score</div>
+                      )}
+                      {exp.key_achievements?.length > 0 && (
+                        <ul style={{ margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {exp.key_achievements.map((ach, j) => (
+                            <li key={j} style={{ fontSize: 12, color: '#A8C0E0', lineHeight: 1.5 }}>{ach}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </Accordion>
+            )}
+
+            {/* Projects */}
+            {result.projects && result.projects.length > 0 && (
+              <Accordion label="🚀 Projects" id="projects" expanded={expanded} onToggle={toggle} badge={result.projects.length}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {(result.projects as Project[]).map((proj, i) => (
+                    <div key={i} style={{ padding: '14px 16px', borderRadius: 10, background: 'rgba(244,114,182,0.04)', border: '1px solid rgba(244,114,182,0.15)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: '#F0F4FF' }}>{proj.name}</span>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          {proj.github_mentioned && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'rgba(74,222,128,0.1)', color: '#4ADE80', fontWeight: 700 }}>GitHub ✓</span>}
+                          {proj.has_metrics ? (
+                            <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'rgba(0,201,177,0.1)', color: '#00C9B1', fontWeight: 700 }}>Metrics ✓</span>
+                          ) : (
+                            <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'rgba(251,191,36,0.1)', color: '#FBBF24', fontWeight: 700 }}>No Metrics</span>
+                          )}
+                        </div>
+                      </div>
+                      <p style={{ fontSize: 12, color: '#A8C0E0', margin: '0 0 10px', lineHeight: 1.55 }}>{proj.description}</p>
+                      {proj.tech_stack?.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                          {proj.tech_stack.map(tech => (
+                            <span key={tech} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 5, background: 'rgba(244,114,182,0.1)', border: '1px solid rgba(244,114,182,0.25)', color: '#F472B6', fontWeight: 600 }}>{tech}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </Accordion>
+            )}
+
+            {/* India job market tips */}
+            {result.indian_job_market_tips && result.indian_job_market_tips.length > 0 && (
+              <Accordion label="🇮🇳 Indian Job Market Tips" id="india_tips" expanded={expanded} onToggle={toggle}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {result.indian_job_market_tips.map((tip, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(255,119,85,0.05)', border: '1px solid rgba(255,119,85,0.2)' }}>
+                      <Globe size={14} color="#FF7755" style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span style={{ fontSize: 13, color: '#A8C0E0', lineHeight: 1.5 }}>{tip}</span>
+                    </div>
+                  ))}
+                </div>
               </Accordion>
             )}
 
@@ -530,15 +645,55 @@ export function ResumeAnalyzerClient() {
           {/* RIGHT COLUMN — sticky sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'sticky', top: 88 }}>
 
-            {/* Top skills */}
-            {result.top_skills?.length > 0 && (
+            {/* Skills breakdown */}
+            {result.extracted_skills && (
+              Object.values(result.extracted_skills).some(arr => arr.length > 0)
+            ) ? (
+              <Card>
+                <SectionHead icon={Code2} title="Skills Breakdown" color="#38BDF8" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {result.extracted_skills.technical.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Technical</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {result.extracted_skills.technical.map(s => <Tag key={s} color="#38BDF8">{s}</Tag>)}
+                      </div>
+                    </div>
+                  )}
+                  {result.extracted_skills.tools.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#A78BFA', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Tools & Platforms</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {result.extracted_skills.tools.map(s => <Tag key={s} color="#A78BFA">{s}</Tag>)}
+                      </div>
+                    </div>
+                  )}
+                  {result.extracted_skills.soft.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#4ADE80', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Soft Skills</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {result.extracted_skills.soft.map(s => <Tag key={s} color="#4ADE80">{s}</Tag>)}
+                      </div>
+                    </div>
+                  )}
+                  {result.extracted_skills.certifications.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#FBBF24', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Certifications</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {result.extracted_skills.certifications.map(s => <Tag key={s} color="#FBBF24">{s}</Tag>)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ) : result.top_skills?.length > 0 ? (
               <Card>
                 <SectionHead icon={Star} title="Top Skills Detected" color="#FBBF24" />
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {result.top_skills.map(sk => <Tag key={sk} color="#FBBF24">{sk}</Tag>)}
                 </div>
               </Card>
-            )}
+            ) : null}
 
             {/* Recommended keywords */}
             {result.recommended_keywords?.length > 0 && (
@@ -559,6 +714,35 @@ export function ResumeAnalyzerClient() {
                 <SectionHead icon={AlertTriangle} title="Missing Keywords" color="#F87171" />
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {result.missing_keywords.map(kw => <Tag key={kw} color="#F87171">{kw}</Tag>)}
+                </div>
+              </Card>
+            )}
+
+            {/* Education */}
+            {result.education && result.education.length > 0 && (
+              <Card>
+                <SectionHead icon={GraduationCap} title="Education" color="#FBBF24" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {result.education.map((edu, i) => (
+                    <div key={i} style={{ paddingBottom: i < result.education!.length - 1 ? 10 : 0, borderBottom: i < result.education!.length - 1 ? '1px solid #1E3A5F' : 'none' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#F0F4FF' }}>{edu.degree}</div>
+                      <div style={{ fontSize: 12, color: '#8B9DC3', marginTop: 2 }}>{edu.institution}</div>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                        {edu.year && <span style={{ fontSize: 11, color: '#4A6FA5' }}>{edu.year}</span>}
+                        {edu.gpa_cgpa && <span style={{ fontSize: 11, color: '#00C9B1', fontWeight: 600 }}>CGPA: {edu.gpa_cgpa}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Keyword density */}
+            {result.keyword_density?.present && result.keyword_density.present.length > 0 && (
+              <Card>
+                <SectionHead icon={CheckCircle2} title="Keywords Already Present" color="#4ADE80" />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {result.keyword_density.present.map(kw => <Tag key={kw} color="#4ADE80">{kw}</Tag>)}
                 </div>
               </Card>
             )}
