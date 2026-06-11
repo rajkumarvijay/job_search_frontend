@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   Briefcase, Search, Bookmark, Sparkles, Crown,
   FileText, Home, PlusCircle, ChevronDown, LayoutDashboard,
-  Info, Mail, Menu, X,
+  Info, Mail, Menu, X, PenLine,
 } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 import { SignInButton, SignUpButton, Show, UserButton } from '@clerk/nextjs'
@@ -106,7 +106,9 @@ function ExploreDropdown({ path }: { path: string }) {
       {open && (
         <div style={panelStyle(260)}>
           <DropItem href="/resume" icon={FileText} label="Resume Score" desc="AI-powered ATS analysis" color="#00C9B1"
-            active={path === '/resume'} onClick={() => setOpen(false)} divider />
+            active={path === '/resume'} onClick={() => setOpen(false)} />
+          <DropItem href="/cover-letter" icon={PenLine} label="Cover Letter" desc="AI-generated in one click" color="#A78BFA"
+            active={path === '/cover-letter'} onClick={() => setOpen(false)} divider />
           {EXPLORE_ITEMS.map(item => (
             <DropItem key={item.href} {...item} active={path === item.href} onClick={() => setOpen(false)} />
           ))}
@@ -162,7 +164,8 @@ const MOBILE_NAV_LINKS = [
   { href: '/search',    icon: Search,          label: 'Search Jobs' },
   { href: '/saved',     icon: Bookmark,        label: 'Saved Jobs'  },
   { href: '/post-job',  icon: PlusCircle,      label: 'Post a Job'  },
-  { href: '/resume',    icon: FileText,        label: 'Resume Score'},
+  { href: '/resume',        icon: FileText,  label: 'Resume Score'  },
+  { href: '/cover-letter',  icon: PenLine,   label: 'Cover Letter'  },
 ]
 
 function MobileDrawer({ path, onClose }: { path: string; onClose: () => void }) {

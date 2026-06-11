@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { Briefcase, Mail, MapPin, Shield, FileText } from 'lucide-react'
 
 const EXPLORE_LINKS = [
-  { href: '/',         label: 'Home'          },
-  { href: '/search',   label: 'Search Jobs'   },
-  { href: '/saved',    label: 'Saved Jobs'    },
-  { href: '/post-job', label: 'Post a Job'    },
-  { href: '/resume',   label: 'Resume Score'  },
+  { href: '/',             label: 'Home'            },
+  { href: '/search',       label: 'Search Jobs'     },
+  { href: '/saved',        label: 'Saved Jobs'      },
+  { href: '/post-job',     label: 'Post a Job'      },
+  { href: '/resume',       label: 'Resume Score'    },
+  { href: '/cover-letter', label: 'Cover Letter AI' },
 ]
 
 const COMPANY_LINKS = [

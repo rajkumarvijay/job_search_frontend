@@ -214,3 +214,13 @@ export interface ResumeResult {
   recommended_jobs?: RecommendedJob[]
   error?: string
 }
+
+export interface CoverLetterResult {
+  cover_letter: string
+  subject_line: string
+  key_matches: string[]
+  tone_used: string
+  word_count: number
+  tips: string[]
+  error?: string
+}

@@ -70,6 +70,31 @@ export const resumeApi = {
   },
 }
 
+export const coverLetterApi = {
+  generate: (params: {
+    job_description: string
+    candidate_name?: string
+    company_name?: string
+    job_title?: string
+    tone?: string
+    file?: File | null
+    resume_text?: string
+  }) => {
+    const fd = new FormData()
+    fd.append('job_description', params.job_description)
+    if (params.candidate_name) fd.append('candidate_name', params.candidate_name)
+    if (params.company_name)   fd.append('company_name',   params.company_name)
+    if (params.job_title)      fd.append('job_title',      params.job_title)
+    if (params.tone)           fd.append('tone',           params.tone)
+    if (params.file)           fd.append('file',           params.file)
+    if (params.resume_text)    fd.append('resume_text',    params.resume_text)
+    return api.post('/ai/cover-letter', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 90_000,
+    })
+  },
+}
+
 export const postJobApi = {
   submit:   (data: object)                          => api.post('/post-jobs/', data),
   list:     (q = '', email = '')                    => api.get('/post-jobs/', { params: { q, email } }),
