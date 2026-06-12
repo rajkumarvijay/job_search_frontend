@@ -1,15 +1,16 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useEffect, Suspense } from 'react'
+import { useEffect, Suspense, useState } from 'react'
 import { SearchBar } from './SearchBar'
 import { JobGrid } from './JobGrid'
 import { FilterSidebar } from './FilterSidebar'
 import { SourceBadge } from './SourceBadge'
 import { useJobSearch } from '@/hooks/useJobSearch'
+import { useSemanticSearch } from '@/hooks/useSemanticSearch'
 import { useSearchHistory } from '@/hooks/useSearchHistory'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { Search } from 'lucide-react'
+import { Search, Sparkles, Zap } from 'lucide-react'
 
 function FilterLoading() {
   return (
@@ -21,49 +22,127 @@ function FilterLoading() {
   )
 }
 
-function SearchContent() {
-  const searchParams = useSearchParams()
-  const q         = searchParams.get('q')        ?? ''
-  const location  = searchParams.get('location') ?? 'India'
-  const platforms = searchParams.get('platforms') ?? 'all'
-  const { addEntry } = useSearchHistory()
+function SearchModeToggle({
+  mode, onChange,
+}: { mode: 'keyword' | 'smart'; onChange: (m: 'keyword' | 'smart') => void }) {
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      background: '#0F2044', border: '1px solid #1E3A5F',
+      borderRadius: 12, padding: 4,
+    }}>
+      <button
+        onClick={() => onChange('keyword')}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '6px 14px', borderRadius: 9, border: 'none', cursor: 'pointer',
+          fontSize: 13, fontWeight: 600, transition: 'all 0.18s',
+          background: mode === 'keyword' ? '#1E3A5F' : 'transparent',
+          color: mode === 'keyword' ? '#F0F4FF' : '#4A6FA5',
+        }}
+      >
+        <Search size={13} /> Keyword
+      </button>
+      <button
+        onClick={() => onChange('smart')}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '6px 14px', borderRadius: 9, border: 'none', cursor: 'pointer',
+          fontSize: 13, fontWeight: 600, transition: 'all 0.18s',
+          background: mode === 'smart' ? 'rgba(0,201,177,0.12)' : 'transparent',
+          color: mode === 'smart' ? '#00C9B1' : '#4A6FA5',
+          boxShadow: mode === 'smart' ? '0 0 0 1px rgba(0,201,177,0.3)' : 'none',
+        }}
+      >
+        <Sparkles size={13} /> Smart Search
+      </button>
+    </div>
+  )
+}
 
-  const { data, isLoading, error } = useJobSearch(
+function SearchContent() {
+  const searchParams          = useSearchParams()
+  const q                     = searchParams.get('q')        ?? ''
+  const location              = searchParams.get('location') ?? 'India'
+  const platforms             = searchParams.get('platforms') ?? 'all'
+  const { addEntry }          = useSearchHistory()
+  const [mode, setMode]       = useState<'keyword' | 'smart'>('keyword')
+
+  const keywordSearch = useJobSearch(
     { q, location, platforms, results_per_site: 10 },
-    !!q,
+    mode === 'keyword' && !!q,
   )
 
+  const smartSearch = useSemanticSearch(
+    { q, location, limit: 30 },
+    mode === 'smart' && !!q,
+  )
+
+  const data      = mode === 'keyword' ? keywordSearch.data      : smartSearch.data
+  const isLoading = mode === 'keyword' ? keywordSearch.isLoading : smartSearch.isLoading
+  const error     = mode === 'keyword' ? keywordSearch.error     : smartSearch.error
+
+  const jobs  = data?.jobs  ?? []
+  const total = data?.total ?? 0
+
   useEffect(() => {
-    if (data && q) addEntry(q, location, data.total)
-  }, [data?.total, q]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (data && q) addEntry(q, location, total)
+  }, [total, q]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
 
       {/* Search bar */}
-      <div style={{ marginBottom: 32 }}>
+      <div style={{ marginBottom: 20 }}>
         <SearchBar defaultQuery={q} defaultLocation={location} />
       </div>
 
+      {/* Mode toggle + hint */}
+      <div style={{ marginBottom: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+        <SearchModeToggle mode={mode} onChange={setMode} />
+        {mode === 'smart' && (
+          <span style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontSize: 12, color: '#00C9B1', fontWeight: 600,
+          }}>
+            <Zap size={12} />
+            Try: &ldquo;remote python work&rdquo; · &ldquo;finance role in bangalore&rdquo; · &ldquo;I&apos;m good at data&rdquo;
+          </span>
+        )}
+      </div>
+
       {/* Results summary */}
-      {q && !isLoading && data && data.total > 0 && (
+      {q && !isLoading && total > 0 && (
         <div style={{
           marginBottom: 24, display: 'flex', flexWrap: 'wrap',
           alignItems: 'center', gap: 12,
         }}>
           <p style={{ fontWeight: 700, fontSize: 16, color: '#F0F4FF', margin: 0 }}>
-            <span style={{ color: '#00C9B1' }}>{data.total.toLocaleString('en-IN')}</span>
-            {' '}jobs for &ldquo;{q}&rdquo;
+            <span style={{ color: '#00C9B1' }}>{total.toLocaleString('en-IN')}</span>
+            {' '}{mode === 'smart' ? 'semantic matches' : 'jobs'} for &ldquo;{q}&rdquo;
             {location !== 'India' && (
               <span style={{ color: '#8B9DC3', fontWeight: 400 }}> in {location}</span>
             )}
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {data.platforms_searched.map(p => <SourceBadge key={p} platform={p} />)}
-          </div>
+          {mode === 'keyword' && keywordSearch.data?.platforms_searched && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {keywordSearch.data.platforms_searched.map(p => <SourceBadge key={p} platform={p} />)}
+            </div>
+          )}
 
-          {data.cached && (
+          {mode === 'smart' && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              fontSize: 11, color: '#00C9B1', padding: '2px 10px',
+              borderRadius: 5, background: 'rgba(0,201,177,0.08)', border: '1px solid rgba(0,201,177,0.2)',
+              fontWeight: 700,
+            }}>
+              <Sparkles size={10} /> AI Semantic
+            </span>
+          )}
+
+          {mode === 'keyword' && keywordSearch.data?.cached && (
             <span style={{
               fontSize: 11, color: '#8B9DC3', padding: '2px 8px',
               borderRadius: 5, background: '#0F2044', border: '1px solid #1E3A5F',
@@ -77,12 +156,14 @@ function SearchContent() {
       {/* Main layout */}
       <div className="search-layout">
 
-        {/* Filter sidebar */}
-        <aside className="search-sidebar">
-          <Suspense fallback={<FilterLoading />}>
-            <FilterSidebar />
-          </Suspense>
-        </aside>
+        {/* Filter sidebar — only shown in keyword mode */}
+        {mode === 'keyword' && (
+          <aside className="search-sidebar">
+            <Suspense fallback={<FilterLoading />}>
+              <FilterSidebar />
+            </Suspense>
+          </aside>
+        )}
 
         {/* Job results */}
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -99,15 +180,17 @@ function SearchContent() {
                 <Search size={28} color="#00C9B1" />
               </div>
               <h2 style={{ fontWeight: 800, fontSize: 20, color: '#F0F4FF', marginBottom: 8 }}>
-                Search for your next role
+                {mode === 'smart' ? 'Describe what you want' : 'Search for your next role'}
               </h2>
-              <p style={{ fontSize: 14, color: '#8B9DC3', maxWidth: 280 }}>
-                Enter a job title, skill, or keyword above to search across 6 job portals simultaneously.
+              <p style={{ fontSize: 14, color: '#8B9DC3', maxWidth: 320 }}>
+                {mode === 'smart'
+                  ? 'Type naturally — "I want a remote data role in Bangalore" or "backend work at a startup".'
+                  : 'Enter a job title, skill, or keyword to search across 6 job portals simultaneously.'}
               </p>
             </div>
           ) : (
             <JobGrid
-              jobs={data?.jobs ?? []}
+              jobs={jobs}
               isLoading={isLoading}
               error={error as Error | null}
               query={q}

@@ -23,6 +23,15 @@ export const jobsApi = {
     results_per_site?: number
     page?: number
   }) => api.get('/jobs/search', { params }),
+
+  semanticSearch: (params: {
+    q: string
+    location?: string
+    limit?: number
+  }) => api.get('/jobs/semantic-search', { params }),
+
+  similarJobs: (jobId: string, limit = 5) =>
+    api.get(`/jobs/similar/${jobId}`, { params: { limit } }),
 }
 
 export const trendingApi = {
