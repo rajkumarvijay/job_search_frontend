@@ -9,6 +9,7 @@ import {
   Globe, CheckCircle2,
 } from 'lucide-react'
 import { resumeApi } from '@/lib/api'
+import { AuthGate } from '@/components/auth/AuthGate'
 import type {
   ResumeResult, Improvement, RecommendedJob,
   QuickWin, Strength, ExperienceEntry, Project,
@@ -163,7 +164,7 @@ function RecoJobCard({ job }: { job: RecommendedJob }) {
 // --- Main Component -----------------------------------------------------------
 type Stage = 'idle' | 'loading' | 'result'
 
-export function ResumeAnalyzerClient() {
+function ResumeAnalyzerInner() {
   const [stage, setStage]         = useState<Stage>('idle')
   const [dragOver, setDragOver]   = useState(false)
   const [fileName, setFileName]   = useState('')
@@ -771,5 +772,13 @@ export function ResumeAnalyzerClient() {
         </div>
       </div>
     </div>
+  )
+}
+
+export function ResumeAnalyzerClient() {
+  return (
+    <AuthGate feature="resume">
+      <ResumeAnalyzerInner />
+    </AuthGate>
   )
 }

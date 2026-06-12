@@ -7,6 +7,7 @@ import {
   RotateCcw, X, Briefcase, User, Building2,
 } from 'lucide-react'
 import { coverLetterApi } from '@/lib/api'
+import { AuthGate } from '@/components/auth/AuthGate'
 import type { CoverLetterResult } from '@/types'
 
 const TONES = ['Professional', 'Enthusiastic', 'Confident', 'Creative', 'Formal']
@@ -24,7 +25,7 @@ function Tag({ children, color = '#00C9B1' }: { children: React.ReactNode; color
   )
 }
 
-export default function CoverLetterPage() {
+function CoverLetterPageInner() {
   // form state
   const [resumeFile, setResumeFile]       = useState<File | null>(null)
   const [resumeText, setResumeText]       = useState('')
@@ -454,5 +455,13 @@ export default function CoverLetterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CoverLetterPage() {
+  return (
+    <AuthGate feature="cover-letter">
+      <CoverLetterPageInner />
+    </AuthGate>
   )
 }

@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronUp, Sparkles, Clock, Star,
 } from 'lucide-react'
 import { jobMatchApi } from '@/lib/api'
+import { AuthGate } from '@/components/auth/AuthGate'
 import type {
   JobMatchResult, JobMatchSkill, MissingSkill,
   MatchStrength, LearningRecommendation,
@@ -100,7 +101,7 @@ function ScoreGauge({ score }: { score: number }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export default function JobMatchPage() {
+function JobMatchPageInner() {
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
   const [resumeMode, setResumeMode] = useState<'file' | 'text'>('file')
@@ -588,5 +589,13 @@ export default function JobMatchPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function JobMatchPage() {
+  return (
+    <AuthGate feature="job-match">
+      <JobMatchPageInner />
+    </AuthGate>
   )
 }
