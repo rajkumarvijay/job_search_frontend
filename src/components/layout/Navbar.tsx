@@ -169,6 +169,7 @@ const MOBILE_NAV_LINKS = [
   { href: '/resume',        icon: FileText,  label: 'Resume Score'  },
   { href: '/cover-letter',  icon: PenLine,   label: 'Cover Letter'   },
   { href: '/job-match',     icon: Target,    label: 'Job Match Score'},
+  { href: '/pricing',       icon: Sparkles,  label: 'Pricing'        },
 ]
 
 function MobileDrawer({ path, onClose }: { path: string; onClose: () => void }) {
@@ -286,6 +287,7 @@ export function Navbar() {
             </Show>
 
             <Show when="signed-in">
+              <PlanBadge />
               <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" active={path === '/dashboard'} />
               <UserButton appearance={{ elements: { avatarBox: { width: 34, height: 34 } } }} />
             </Show>

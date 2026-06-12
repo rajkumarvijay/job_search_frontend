@@ -11,6 +11,7 @@ const EXPLORE_LINKS = [
   { href: '/resume',       label: 'Resume Score'    },
   { href: '/cover-letter', label: 'Cover Letter AI'  },
   { href: '/job-match',    label: 'Job Match Score'  },
+  { href: '/pricing',      label: 'Pricing'          },
 ]
 
 const COMPANY_LINKS = [
