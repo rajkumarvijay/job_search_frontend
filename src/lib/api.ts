@@ -70,6 +70,19 @@ export const resumeApi = {
   },
 }
 
+export const jobMatchApi = {
+  analyse: (params: { job_description: string; file?: File | null; resume_text?: string }) => {
+    const fd = new FormData()
+    fd.append('job_description', params.job_description)
+    if (params.file)        fd.append('file',        params.file)
+    if (params.resume_text) fd.append('resume_text', params.resume_text)
+    return api.post('/ai/job-match', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 90_000,
+    })
+  },
+}
+
 export const coverLetterApi = {
   generate: (params: {
     job_description: string

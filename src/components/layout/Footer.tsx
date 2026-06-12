@@ -9,7 +9,8 @@ const EXPLORE_LINKS = [
   { href: '/saved',        label: 'Saved Jobs'      },
   { href: '/post-job',     label: 'Post a Job'      },
   { href: '/resume',       label: 'Resume Score'    },
-  { href: '/cover-letter', label: 'Cover Letter AI' },
+  { href: '/cover-letter', label: 'Cover Letter AI'  },
+  { href: '/job-match',    label: 'Job Match Score'  },
 ]
 
 const COMPANY_LINKS = [

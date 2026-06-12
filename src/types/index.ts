@@ -215,6 +215,52 @@ export interface ResumeResult {
   error?: string
 }
 
+export interface JobMatchSkill {
+  skill: string
+  found_in_resume?: string
+  jd_requirement?: string
+  proficiency?: string
+}
+
+export interface MissingSkill {
+  skill: string
+  importance: 'Must-have' | 'Nice-to-have'
+  jd_context?: string
+  gap_size?: 'Large' | 'Medium' | 'Small'
+}
+
+export interface MatchStrength {
+  title: string
+  detail: string
+  impact?: 'High' | 'Medium'
+}
+
+export interface LearningRecommendation {
+  skill: string
+  reason: string
+  resource: string
+  timeframe: string
+  priority: 'High' | 'Medium' | 'Low'
+}
+
+export interface JobMatchResult {
+  match_score: number
+  match_grade: string
+  match_summary: string
+  matched_skills: JobMatchSkill[]
+  missing_skills: MissingSkill[]
+  strengths: MatchStrength[]
+  learning_recommendations: LearningRecommendation[]
+  experience_match?: {
+    required_years: number | null
+    candidate_years: number | null
+    verdict: string
+  }
+  role_fit_tags: string[]
+  quick_actions: string[]
+  error?: string
+}
+
 export interface CoverLetterResult {
   cover_letter: string
   subject_line: string
