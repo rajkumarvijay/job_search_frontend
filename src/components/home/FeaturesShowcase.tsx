@@ -1,18 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, FileText, BarChart2, PlusCircle, ArrowRight } from 'lucide-react'
+import { Target, FileText, BarChart2, PlusCircle, ArrowRight } from 'lucide-react'
 
 const FEATURES = [
   {
-    icon: Search,
+    icon: Target,
     color: '#00C9B1',
-    badge: 'Core Feature',
-    title: 'Unified Job Search',
-    desc: 'Search once and get results from LinkedIn, Indeed, Naukri, Glassdoor, ZipRecruiter, and Google Jobs — all ranked in one clean feed.',
-    bullets: ['6 portals in 1 search', 'Filter by location, salary & source', 'One-click apply to original listing'],
-    href: '/search',
-    cta: 'Search Jobs',
+    badge: 'AI Powered',
+    title: 'Job Match Score',
+    desc: 'Instantly find out how well your resume matches any job description — before you apply. Know your score, gaps, and exactly what to fix.',
+    bullets: ['0–100 match score in seconds', 'Matched & missing skills breakdown', 'Personalised learning recommendations'],
+    href: '/job-match',
+    cta: 'Check My Match',
   },
   {
     icon: FileText,
