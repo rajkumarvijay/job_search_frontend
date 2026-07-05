@@ -10,7 +10,9 @@ import { useJobSearch } from '@/hooks/useJobSearch'
 import { useSemanticSearch } from '@/hooks/useSemanticSearch'
 import { useSearchHistory } from '@/hooks/useSearchHistory'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { Search, Sparkles, Zap } from 'lucide-react'
+import { Search, Sparkles, Zap, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const SMART_PAGE_SIZE = 10
 
 function FilterLoading() {
   return (
@@ -67,6 +69,10 @@ function SearchContent() {
   const platforms             = searchParams.get('platforms') ?? 'all'
   const { addEntry }          = useSearchHistory()
   const [mode, setMode]       = useState<'keyword' | 'smart'>('keyword')
+  const [smartPage, setSmartPage] = useState(1)
+
+  // Reset smart page when query or mode changes
+  useEffect(() => { setSmartPage(1) }, [q, mode])
 
   const keywordSearch = useJobSearch(
     { q, location, platforms, results_per_site: 10 },
@@ -82,8 +88,14 @@ function SearchContent() {
   const isLoading = mode === 'keyword' ? keywordSearch.isLoading : smartSearch.isLoading
   const error     = mode === 'keyword' ? keywordSearch.error     : smartSearch.error
 
-  const jobs  = data?.jobs  ?? []
-  const total = data?.total ?? 0
+  const allJobs = data?.jobs ?? []
+  const total   = data?.total ?? 0
+
+  // For smart mode: paginate client-side. Keyword mode shows all (has its own pagination).
+  const smartTotalPages = Math.ceil(allJobs.length / SMART_PAGE_SIZE)
+  const jobs = mode === 'smart'
+    ? allJobs.slice((smartPage - 1) * SMART_PAGE_SIZE, smartPage * SMART_PAGE_SIZE)
+    : allJobs
 
   useEffect(() => {
     if (data && q) addEntry(q, location, total)
@@ -189,12 +201,60 @@ function SearchContent() {
               </p>
             </div>
           ) : (
-            <JobGrid
-              jobs={jobs}
-              isLoading={isLoading}
-              error={error as Error | null}
-              query={q}
-            />
+            <>
+              <JobGrid
+                jobs={jobs}
+                isLoading={isLoading}
+                error={error as Error | null}
+                query={q}
+              />
+
+              {/* Smart Search pagination */}
+              {mode === 'smart' && !isLoading && smartTotalPages > 1 && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  gap: 12, marginTop: 32, paddingTop: 24,
+                  borderTop: '1px solid #1E3A5F',
+                }}>
+                  <button
+                    onClick={() => { setSmartPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    disabled={smartPage === 1}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '8px 18px', borderRadius: 10, border: '1px solid #1E3A5F',
+                      background: smartPage === 1 ? '#0A1628' : '#0F2044',
+                      color: smartPage === 1 ? '#2A4A7F' : '#F0F4FF',
+                      cursor: smartPage === 1 ? 'not-allowed' : 'pointer',
+                      fontSize: 13, fontWeight: 600, transition: 'all 0.15s',
+                    }}
+                  >
+                    <ChevronLeft size={15} /> Previous
+                  </button>
+
+                  <span style={{ fontSize: 13, color: '#8B9DC3', fontWeight: 500 }}>
+                    Page <span style={{ color: '#F0F4FF', fontWeight: 700 }}>{smartPage}</span>
+                    {' '}of{' '}
+                    <span style={{ color: '#F0F4FF', fontWeight: 700 }}>{smartTotalPages}</span>
+                  </span>
+
+                  <button
+                    onClick={() => { setSmartPage(p => Math.min(smartTotalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    disabled={smartPage === smartTotalPages}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '8px 18px', borderRadius: 10,
+                      background: smartPage === smartTotalPages ? '#0A1628' : 'rgba(0,201,177,0.1)',
+                      color: smartPage === smartTotalPages ? '#2A4A7F' : '#00C9B1',
+                      cursor: smartPage === smartTotalPages ? 'not-allowed' : 'pointer',
+                      fontSize: 13, fontWeight: 600, transition: 'all 0.15s',
+                      border: smartPage === smartTotalPages ? '1px solid #1E3A5F' : '1px solid rgba(0,201,177,0.3)',
+                    }}
+                  >
+                    Next <ChevronRight size={15} />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
