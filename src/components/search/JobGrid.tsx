@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, SearchX } from 'lucide-react'
+import { Loader2, SearchX, Cpu } from 'lucide-react'
 import { JobCard } from './JobCard'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import type { JobResult } from '@/types'
@@ -46,7 +46,33 @@ export function JobGrid({ jobs, isLoading, error, query, mode = 'keyword' }: Pro
 
   if (error) {
     const msg = (error?.message ?? '').toString()
-    const isCors = msg.includes('Network Error') || msg.includes('network') || msg === ''
+    const status = (error as any)?.response?.status
+    const isWarmingUp = status === 503
+    const isCors = !isWarmingUp && (msg.includes('Network Error') || msg.includes('network') || msg === '')
+
+    if (isWarmingUp) {
+      return (
+        <div style={{ textAlign: 'center', padding: '60px 0' }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 18, margin: '0 auto 20px',
+            background: 'rgba(0,201,177,0.08)', border: '1px solid rgba(0,201,177,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Cpu size={28} color="#00C9B1" />
+          </div>
+          <h3 style={{ fontWeight: 800, fontSize: 18, color: '#F0F4FF', marginBottom: 10 }}>
+            AI Model Warming Up
+          </h3>
+          <p style={{ fontSize: 14, color: '#8B9DC3', maxWidth: 380, margin: '0 auto 16px' }}>
+            The semantic search model is loading from disk. This happens once after inactivity and takes about 45 seconds. Retrying automatically…
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#00C9B1', fontSize: 13 }}>
+            <Loader2 size={14} className="animate-spin" />
+            Retrying in ~45s
+          </div>
+        </div>
+      )
+    }
 
     return (
       <div style={{ textAlign: 'center', padding: '60px 0' }}>
