@@ -207,6 +207,7 @@ function SearchContent() {
                 isLoading={isLoading}
                 error={error as Error | null}
                 query={q}
+                mode={mode}
               />
 
               {/* Smart Search pagination */}

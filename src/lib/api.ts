@@ -28,7 +28,7 @@ export const jobsApi = {
     q: string
     location?: string
     limit?: number
-  }) => api.get('/jobs/semantic-search', { params }),
+  }) => api.get('/jobs/semantic-search', { params, timeout: 120_000 }),
 
   similarJobs: (jobId: string, limit = 5) =>
     api.get(`/jobs/similar/${jobId}`, { params: { limit } }),

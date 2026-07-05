@@ -22,9 +22,9 @@ function SkeletonCard() {
   )
 }
 
-interface Props { jobs: JobResult[]; isLoading: boolean; error: Error | null; query: string }
+interface Props { jobs: JobResult[]; isLoading: boolean; error: Error | null; query: string; mode?: 'keyword' | 'smart' }
 
-export function JobGrid({ jobs, isLoading, error, query }: Props) {
+export function JobGrid({ jobs, isLoading, error, query, mode = 'keyword' }: Props) {
   if (isLoading) {
     return (
       <div>
@@ -33,7 +33,9 @@ export function JobGrid({ jobs, isLoading, error, query }: Props) {
           marginBottom: 20, color: '#8B9DC3', fontSize: 14,
         }}>
           <Loader2 size={15} color="#00C9B1" className="animate-spin" />
-          Searching 6 portals for &ldquo;{query}&rdquo;… this takes a few seconds
+          {mode === 'smart'
+            ? <>Finding semantic matches for &ldquo;{query}&rdquo;… may take up to 30s on first search</>
+            : <>Searching 6 portals for &ldquo;{query}&rdquo;… this takes a few seconds</>}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: 16 }}>
           {Array.from({ length: 8 }, (_, i) => <SkeletonCard key={i} />)}
@@ -59,8 +61,8 @@ export function JobGrid({ jobs, isLoading, error, query }: Props) {
           {isCors ? 'Cannot reach backend' : 'Search failed'}
         </h3>
         {isCors ? (
-          <p style={{ fontSize: 14, color: '#8B9DC3', maxWidth: 360, margin: '0 auto' }}>
-            Check that <code style={{ color: '#38BDF8' }}>NEXT_PUBLIC_API_URL</code> is set correctly in Vercel and <code style={{ color: '#38BDF8' }}>CORS_ORIGINS</code> is set in Railway.
+          <p style={{ fontSize: 14, color: '#8B9DC3', maxWidth: 400, margin: '0 auto' }}>
+            The backend may be waking up (free tier sleeps after inactivity). Wait 30 seconds and try again. If it keeps failing, check that <code style={{ color: '#38BDF8' }}>NEXT_PUBLIC_API_URL</code> ends with <code style={{ color: '#38BDF8' }}>/api/v1</code> in Vercel.
           </p>
         ) : (
           <p style={{ fontSize: 14, color: '#8B9DC3' }}>
